@@ -96,6 +96,11 @@ exclude_keywords:
   - 지능형
   - 블랙박스
 
+# 대시보드에서 별색으로 강조할 공고 (제목 기준, 띄어쓰기 무시)
+highlight_keywords:
+  - 홍보영상
+  - 홍보동영상
+
 # 대시보드에 보여줄 기간(일) / DB 보관 기간(일)
 dashboard_days: 90
 keep_days: 365

@@ -54,6 +54,7 @@ def build_site(store: Store, settings: dict, sources: list[dict], out_dir: Path)
     data = {
         "generated": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "keywords": settings.get("keywords", []),
+        "highlight": settings.get("highlight_keywords", []),
         "sources": [
             {"id": s["id"], "name": s.get("name", s["id"]), "category": s.get("category", ""),
              "url": s.get("home") or s.get("url", ""), **statuses.get(s["id"], {})}

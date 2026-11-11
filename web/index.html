@@ -16,6 +16,7 @@
   --accent:#2563eb; --accent-bg:#eff4ff; --warn:#b45309; --warn-bg:#fff7e6;
   --danger:#dc2626; --ok:#15803d; --new:#7c3aed;
   --plan:#0e7490; --prespec:#9333ea; --bid:#2563eb; --req:#c2410c;
+  --hl:#e11d74; --hl-bg:#fff1f6;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -23,6 +24,7 @@
     --accent:#6b9bff; --accent-bg:#1c2640; --warn:#f0b35a; --warn-bg:#2d2416;
     --danger:#f87171; --ok:#4ade80; --new:#b794f6;
     --plan:#22b8cf; --prespec:#c084fc; --bid:#6b9bff; --req:#fb923c;
+    --hl:#f0569b; --hl-bg:#3a1a2a;
   }
 }
 * { box-sizing:border-box }
@@ -53,6 +55,8 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 .item { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 14px;
   display:grid; grid-template-columns:1fr auto; gap:4px 12px }
 .item.expired { opacity:.55 }
+.item.hl { background:var(--hl-bg); border-color:var(--hl); box-shadow:inset 5px 0 0 var(--hl) }
+.hl-tag { font-size:12px; font-weight:800; color:#fff; background:var(--hl); border-radius:5px; padding:1px 7px; white-space:nowrap }
 .item .t { font-weight:600; color:var(--text); text-decoration:none; word-break:keep-all; overflow-wrap:anywhere }
 .item .t:hover { color:var(--accent) }
 .meta { color:var(--sub); font-size:13px; display:flex; gap:4px 10px; flex-wrap:wrap; grid-column:1 }
@@ -294,6 +298,11 @@ function sorted(list) {
 
 const AMOUNT_LABEL = { "입찰공고": "추정가격", "사전규격": "배정예산", "발주계획": "발주금액" };
 
+function isHighlight(n) {
+  const t = (n.title || "").replace(/\s/g, "");
+  return (DATA.highlight || []).some(k => k && t.includes(k.replace(/\s/g, "")));
+}
+
 function card(n) {
   const own = isG2B(n) || n.category === "학교장터";
   const stageCls = own ? "st-" + n.category : n.category === "방송사 공모" ? "st-방송사" : "st-req";
@@ -307,7 +316,8 @@ function card(n) {
     n.analysis && n.analysis.ok && n.analysis.period && `<span class="badge-ai">기간 ${esc(n.analysis.period)}</span>`,
     n.analysis && n.analysis.ok && n.analysis.tech_price_ratio && `<span class="badge-ai">기술:가격 ${esc(n.analysis.tech_price_ratio)}</span>`,
   ].filter(Boolean).join("");
-  return `<div class="item ${isExpired(n) ? "expired" : ""}">
+  const hl = isHighlight(n);
+  return `<div class="item ${isExpired(n) ? "expired" : ""} ${hl ? "hl" : ""}">
     <a class="t" href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.title)}</a>
     <div class="side">
       <span class="badge ${stageCls}">${esc(stageLabel)}</span>
@@ -318,7 +328,7 @@ function card(n) {
         <button data-hide="${esc(n.id)}" title="${hidden.has(n.id) ? "다시 보기" : "숨기기"}">${hidden.has(n.id) ? "↺" : "✕"}</button>
       </span>
     </div>
-    <div class="meta">${isNew ? '<span class="new">NEW</span>' : ""}${meta}${stageLink(n)}</div>
+    <div class="meta">${hl ? '<span class="hl-tag">홍보영상</span>' : ""}${isNew ? '<span class="new">NEW</span>' : ""}${meta}${stageLink(n)}</div>
     ${stageCls === "st-req" && n.kind ? `<div class="desc">${esc(n.kind)}</div>` : ""}
     ${details(n)}
   </div>`;
