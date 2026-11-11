@@ -255,3 +255,14 @@ def test_store_updates_files_for_existing(tmp_path):
     assert st.add([n2], "2026-11-12 07:00") == []          # 새 공고 아님 → 알림 없음
     row = st.recent(30)[0]
     assert row["files"][0]["name"] == "a.hwp" and row["first_seen"] == "2026-11-11 10:00"
+
+
+def test_board_link_mode_and_detail_deadline():
+    src = {"id": "c", "url": "https://www.contestkorea.com/sub/list.php?x=1", "link_mode": True,
+           "url_contains": "Txt_bcode=031210001&str_no=", "title_strip": r"^(?:\d+\.\s*)?(?:\S+•\S+\s+)*"}
+    html = """<a href="/sub/view.php?int_gbn=1&Txt_bcode=031210001&str_no=1">사진•영상•영화제 광명역 AI 영상 공모전</a>
+              <a href="/sub/view.php?int_gbn=1&Txt_bcode=030110001&str_no=3">문학 공모</a>
+              <a href="/faq?x=1">자주 묻는 질문 2024.10.06</a>"""
+    items = board.extract(html, src)
+    assert [n.title for n in items] == ["광명역 AI 영상 공모전"]
+    assert board.detail_deadline("<p>접수기간 : 2026.11.01 ~ 2026.12.15</p>") == "2026-12-15"

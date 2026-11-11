@@ -134,6 +134,20 @@ sources:
     max_age_days: 120
     allow_empty: true
 
+  # ═══ 공모전 (영상·UCC) ═══
+  - id: contestkorea_video
+    type: board
+    name: 콘테스트코리아
+    category: 공모전
+    url: https://www.contestkorea.com/sub/list.php?int_gbn=1&Txt_bcode=031210001
+    link_mode: true
+    url_contains: "Txt_bcode=031210001&str_no="
+    title_strip: '^(?:\d+\.\s*)?(?:\S+•\S+\s+)*'
+    detail_deadline: true
+    filter: all
+    exclude: [수상자, 결과, 발표, 사진공모전, 사진 공모전, 수중사진]
+    allow_empty: true
+
   # ═══ 영역 2. 제작 의뢰·공모 (입찰 외) ═══
 
   # 네이버 카페·블로그·뉴스 검색 (NAVER_CLIENT_ID / NAVER_CLIENT_SECRET 필요)

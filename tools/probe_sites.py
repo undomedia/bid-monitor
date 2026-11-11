@@ -50,6 +50,19 @@ def probe(url: str) -> str:
         out.append(f"- 실패: {type(e).__name__}: {e}")
         return "\n".join(out)
 
+    # 화면 글 중 공고처럼 보이는 줄 (게시글이 링크가 아닌 사이트 구조 확인용)
+    lines = [clean(x) for x in soup.get_text("\n").split("\n")]
+    hits = [x for x in lines if x and len(x) < 120 and re.search(r"공모|공고|모집|20\d\d[.-]", x)]
+    if hits:
+        out.append(f"- 화면 글 중 공고 후보 {len(hits)}줄")
+        out.extend(f"    · {x}" for x in hits[:30])
+    clicks = [clean(str(t))[:160] for t in soup.select("[onclick]")][:8]
+    if clicks:
+        out.append("- 클릭 동작 예: " + " / ".join(clicks))
+    from monitor.collectors.board import detail_deadline
+    dl = detail_deadline(html)
+    if dl:
+        out.append(f"- 접수 마감일 인식: {dl}")
     items = board.extract(html, {"id": "p", "url": r.url})
     out.append(f"- 자동 인식 게시글 {len(items)}건")
     for n in items[:12]:

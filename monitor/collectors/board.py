@@ -90,9 +90,14 @@ def extract(html: str, source: dict) -> list[Notice]:
     for bad in soup.select("script, style, header, footer, nav"):
         bad.decompose()
 
-    rows = soup.select(source["list_selector"]) if source.get("list_selector") else _rows_auto(soup)
-    fallback = False
-    if not rows and not source.get("list_selector"):
+    if source.get("link_mode"):
+        # 목록이 표 형태가 아닌 사이트: 주소에 특정 글자가 들어간 링크를 모두 게시글로 본다
+        rows = [a for a in soup.find_all("a") if source.get("url_contains", "") in (a.get("href") or "")]
+        fallback = True
+    else:
+        rows = soup.select(source["list_selector"]) if source.get("list_selector") else _rows_auto(soup)
+        fallback = False
+    if not rows and not source.get("list_selector") and not source.get("link_mode"):
         words = source.get("include") or DEFAULT_FALLBACK_WORDS
         rows = [a for a in soup.find_all("a") if any(w in clean(a.get_text()) for w in words)]
         fallback = True
@@ -146,8 +151,36 @@ def extract(html: str, source: dict) -> list[Notice]:
     return out
 
 
+_DEADLINE_WORDS = ("접수기간", "접수 기간", "공모기간", "응모기간", "모집기간", "접수마감", "마감일", "접수일정")
+
+
+def detail_deadline(html: str) -> str:
+    """상세 화면 글에서 '접수기간 2026.11.01 ~ 2026.12.15' 같은 부분을 찾아 마감일을 돌려준다."""
+    text = BeautifulSoup(html, "html.parser").get_text(" ")
+    for w in _DEADLINE_WORDS:
+        i = text.find(w)
+        if i >= 0:
+            dates = find_dates(text[i:i + 80])
+            if dates:
+                return max(dates)
+    return ""
+
+
 def collect(source: dict, lookback_days: float | None = None) -> list[Notice]:
     notices = extract(fetch_html(source), source)
+    if source.get("detail_deadline"):
+        import time
+        for n in notices[: int(source.get("max_details", 40))]:
+            if n.url == source["url"]:
+                continue
+            try:
+                r = session().get(n.url, timeout=30)
+                if not r.encoding or r.encoding.lower() == "iso-8859-1":
+                    r.encoding = r.apparent_encoding
+                n.deadline = n.deadline or detail_deadline(r.text)
+            except Exception:  # noqa: BLE001
+                pass
+            time.sleep(0.3)
     if not notices and not source.get("allow_empty"):
         raise RuntimeError("게시판에서 글을 하나도 찾지 못했습니다 (URL 또는 선택자 확인 필요)")
     return notices
