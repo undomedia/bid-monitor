@@ -48,7 +48,9 @@ def build_site(store: Store, settings: dict, sources: list[dict], out_dir: Path)
         "notices": store.recent(int(settings.get("dashboard_days", 60)), with_analysis=True),
     }
     (out_dir / "data.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
-    shutil.copy(ROOT / "web" / "index.html", out_dir / "index.html")
+    for f in (ROOT / "web").iterdir():          # index.html, 아이콘, manifest
+        if f.is_file():
+            shutil.copy(f, out_dir / f.name)
 
 
 def cmd_run(args, settings, sources) -> int:
