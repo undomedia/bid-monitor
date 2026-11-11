@@ -63,6 +63,8 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 .st-req { color:var(--req) } .st-학교장터 { color:var(--ok) } .st-방송사 { color:var(--prespec) }
 .new { color:var(--new); font-size:12px; font-weight:700 }
 .dday { font-size:13px; font-weight:700; white-space:nowrap }
+.money { font-size:16px; font-weight:800; white-space:nowrap; color:var(--text); letter-spacing:-.2px }
+.money small { font-size:11px; font-weight:600; color:var(--sub); margin-right:3px; letter-spacing:0 }
 .dday.urgent { color:var(--danger) } .dday.soon { color:var(--warn) } .dday.past { color:var(--sub); font-weight:500 }
 .amt { font-weight:600; color:var(--text) }
 .acts { display:flex; gap:2px }
@@ -105,8 +107,9 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 .empty { text-align:center; color:var(--sub); padding:48px 0 }
 .foot { color:var(--sub); font-size:12px; margin:24px 0 8px; text-align:center }
 @media (max-width:560px) {
-  .item { grid-template-columns:1fr }
-  .side { grid-row:auto; grid-column:1; flex-direction:row; align-items:center; justify-content:space-between }
+  .item { grid-template-columns:minmax(0, 1fr) }
+  .side { grid-row:auto; grid-column:1; flex-direction:row; flex-wrap:wrap; align-items:center; gap:4px 10px }
+  .side .acts { margin-left:auto }
 }
 </style>
 </head>
@@ -257,8 +260,10 @@ function dday(n) {
 
 function won(a) {
   if (!a) return "";
-  if (a >= 1e8) return (a / 1e8).toFixed(a >= 1e9 ? 0 : 1).replace(/\.0$/, "") + "억원";
-  return Math.round(a / 1e4).toLocaleString() + "만원";
+  const eok = Math.floor(a / 1e8), man = Math.round((a % 1e8) / 1e4);
+  if (eok && man) return `${eok.toLocaleString()}억 ${man.toLocaleString()}만원`;
+  if (eok) return `${eok.toLocaleString()}억원`;
+  return `${man.toLocaleString()}만원`;
 }
 
 function inTab(n, tab) {
@@ -287,6 +292,8 @@ function sorted(list) {
   return list.slice().sort(by);
 }
 
+const AMOUNT_LABEL = { "입찰공고": "추정가격", "사전규격": "배정예산", "발주계획": "발주금액" };
+
 function card(n) {
   const own = isG2B(n) || n.category === "학교장터";
   const stageCls = own ? "st-" + n.category : n.category === "방송사 공모" ? "st-방송사" : "st-req";
@@ -297,7 +304,6 @@ function card(n) {
     n.posted && `<span>게시 ${esc(n.posted)}</span>`,
     n.deadline && `<span>마감 ${esc(n.deadline)}</span>`,
     (isG2B(n) || n.category === "학교장터") && n.kind && `<span>${esc(n.kind)}</span>`,
-    n.amount && `<span class="amt">${won(n.amount)}</span>`,
     n.analysis && n.analysis.ok && n.analysis.period && `<span class="badge-ai">기간 ${esc(n.analysis.period)}</span>`,
     n.analysis && n.analysis.ok && n.analysis.tech_price_ratio && `<span class="badge-ai">기술:가격 ${esc(n.analysis.tech_price_ratio)}</span>`,
   ].filter(Boolean).join("");
@@ -305,6 +311,7 @@ function card(n) {
     <a class="t" href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.title)}</a>
     <div class="side">
       <span class="badge ${stageCls}">${esc(stageLabel)}</span>
+      ${n.amount ? `<span class="money"><small>${AMOUNT_LABEL[n.category] || "금액"}</small>${won(n.amount)}</span>` : ""}
       ${dday(n)}
       <span class="acts">
         <button class="star ${stars.has(n.id) ? "on" : ""}" data-star="${esc(n.id)}" title="관심">★</button>
