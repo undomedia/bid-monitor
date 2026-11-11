@@ -48,11 +48,27 @@ def load_config(path: Path) -> tuple[dict, list[dict]]:
     return settings, [s for s in sources.get("sources", []) if s.get("enabled", True)]
 
 
+def cleanup(store: Store, settings: dict, sources: list[dict]) -> None:
+    """제외어를 바꾸면 이미 저장된 공고에도 적용 (대시보드에서 바로 사라지게)."""
+    from .models import Notice
+    by_id = {x["id"]: x for x in sources}
+    gone = []
+    for d in store.recent(int(settings.get("keep_days", 180))):
+        src = by_id.get(d["source_id"], {})
+        n = Notice(source_id=d["source_id"], source_name="", category="", title=d["title"], url="")
+        if not filters.apply([n], src, settings):
+            gone.append(d["id"])
+    if gone:
+        store.delete(gone)
+        print(f"바뀐 제외어에 따라 기존 공고 {len(gone)}건 정리")
+
+
 def build_site(store: Store, settings: dict, sources: list[dict], out_dir: Path) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     statuses = store.statuses()
     data = {
-        "generated": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "generated": max((st.get("checked", "") for st in statuses.values()), default="")
+                     or datetime.now().strftime("%Y-%m-%d %H:%M"),
         "keywords": settings.get("keywords", []),
         "highlight": settings.get("highlight_keywords", []),
         "sources": [
@@ -103,18 +119,7 @@ def cmd_run(args, settings, sources) -> int:
         store.set_status(src["id"], status)
 
     store.prune(int(settings.get("keep_days", 180)))
-    # 제외어를 바꾸면 이미 저장된 공고에도 적용 (대시보드에서 바로 사라지게)
-    from .models import Notice
-    by_id = {x["id"]: x for x in sources}
-    gone = []
-    for d in store.recent(int(settings.get("keep_days", 180))):
-        src = by_id.get(d["source_id"], {})
-        n = Notice(source_id=d["source_id"], source_name="", category="", title=d["title"], url="")
-        if not filters.apply([n], src, settings):
-            gone.append(d["id"])
-    if gone:
-        store.delete(gone)
-        print(f"바뀐 제외어에 따라 기존 공고 {len(gone)}건 정리")
+    cleanup(store, settings, sources)
     if not args.no_analyze:
         analyze.run(store, settings, now)
     build_site(store, settings, sources, ROOT / settings.get("site_dir", "docs"))
@@ -165,6 +170,7 @@ def main(argv=None) -> int:
     settings, sources = load_config(Path(args.config))
     if args.cmd == "build":
         store = Store(ROOT / settings.get("db_path", "data/notices.db"))
+        cleanup(store, settings, sources)
         build_site(store, settings, sources, ROOT / settings.get("site_dir", "docs"))
         return 0
     return cmd_run(args, settings, sources)

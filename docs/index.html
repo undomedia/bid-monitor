@@ -16,6 +16,7 @@
   --accent:#2563eb; --accent-bg:#eff4ff; --warn:#b45309; --warn-bg:#fff7e6;
   --danger:#dc2626; --ok:#15803d; --new:#7c3aed;
   --plan:#0e7490; --prespec:#9333ea; --bid:#2563eb; --req:#c2410c;
+  --hl:#e11d74; --hl-bg:#fff1f6;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -23,6 +24,7 @@
     --accent:#6b9bff; --accent-bg:#1c2640; --warn:#f0b35a; --warn-bg:#2d2416;
     --danger:#f87171; --ok:#4ade80; --new:#b794f6;
     --plan:#22b8cf; --prespec:#c084fc; --bid:#6b9bff; --req:#fb923c;
+    --hl:#f0569b; --hl-bg:#3a1a2a;
   }
 }
 * { box-sizing:border-box }
@@ -53,6 +55,8 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 .item { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 14px;
   display:grid; grid-template-columns:1fr auto; gap:4px 12px }
 .item.expired { opacity:.55 }
+.item.hl { background:var(--hl-bg); border-color:var(--hl); box-shadow:inset 5px 0 0 var(--hl) }
+.hl-tag { font-size:12px; font-weight:800; color:#fff; background:var(--hl); border-radius:5px; padding:1px 7px; white-space:nowrap }
 .item .t { font-weight:600; color:var(--text); text-decoration:none; word-break:keep-all; overflow-wrap:anywhere }
 .item .t:hover { color:var(--accent) }
 .meta { color:var(--sub); font-size:13px; display:flex; gap:4px 10px; flex-wrap:wrap; grid-column:1 }
@@ -60,9 +64,11 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 .side { grid-row:1 / span 2; grid-column:2; display:flex; align-items:center; gap:8px; align-self:start }
 .badge { font-size:12px; font-weight:700; padding:1px 7px; border-radius:5px; border:1px solid currentColor; white-space:nowrap }
 .st-발주계획 { color:var(--plan) } .st-사전규격 { color:var(--prespec) } .st-입찰공고 { color:var(--bid) }
-.st-req { color:var(--req) } .st-학교장터 { color:var(--ok) }
+.st-req { color:var(--req) } .st-학교장터 { color:var(--ok) } .st-방송사 { color:var(--prespec) }
 .new { color:var(--new); font-size:12px; font-weight:700 }
 .dday { font-size:13px; font-weight:700; white-space:nowrap }
+.money { font-size:16px; font-weight:800; white-space:nowrap; color:var(--text); letter-spacing:-.2px }
+.money small { font-size:11px; font-weight:600; color:var(--sub); margin-right:3px; letter-spacing:0 }
 .dday.urgent { color:var(--danger) } .dday.soon { color:var(--warn) } .dday.past { color:var(--sub); font-weight:500 }
 .amt { font-weight:600; color:var(--text) }
 .acts { display:flex; gap:2px }
@@ -79,6 +85,8 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 .facts dt { color:var(--sub); flex:0 0 auto; margin:0 }
 .facts dd { margin:0; font-weight:600; overflow-wrap:anywhere }
 .facts .hl dd { color:var(--accent) }
+.req { margin-top:8px; background:var(--bg); border-radius:8px; padding:10px 12px; font-size:13px; white-space:pre-wrap; line-height:1.6 }
+.req b { display:block; color:var(--sub); font-weight:600; margin-bottom:2px }
 .files { margin:10px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:4px; font-size:13px }
 .files a { color:var(--text); text-decoration:none; display:inline-flex; gap:6px; align-items:baseline }
 .files a:hover { color:var(--accent); text-decoration:underline }
@@ -105,8 +113,9 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 .empty { text-align:center; color:var(--sub); padding:48px 0 }
 .foot { color:var(--sub); font-size:12px; margin:24px 0 8px; text-align:center }
 @media (max-width:560px) {
-  .item { grid-template-columns:1fr }
-  .side { grid-row:auto; grid-column:1; flex-direction:row; align-items:center; justify-content:space-between }
+  .item { grid-template-columns:minmax(0, 1fr) }
+  .side { grid-row:auto; grid-column:1; flex-direction:row; flex-wrap:wrap; align-items:center; gap:4px 10px }
+  .side .acts { margin-left:auto }
 }
 </style>
 </head>
@@ -123,6 +132,7 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
     <button class="tab" data-tab="사전규격">사전규격<span class="n"></span></button>
     <button class="tab" data-tab="발주계획">발주계획<span class="n"></span></button>
     <button class="tab" data-tab="학교장터">학교장터<span class="n"></span></button>
+    <button class="tab" data-tab="방송사 공모">방송사 공모<span class="n"></span></button>
     <button class="tab" data-tab="req">제작 의뢰·공모<span class="n"></span></button>
     <button class="tab" data-tab="star">★ 관심<span class="n"></span></button>
   </nav>
@@ -146,9 +156,10 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 const G2B = ["발주계획", "사전규격", "입찰공고"];
 const TAB_DESC = {
   "입찰공고": "지금 입찰 가능한 공고 · 마감 지난 공고는 숨김",
-  "사전규격": "곧 입찰로 나올 사업 · 첨부된 제안요청서(안)로 미리 준비하세요",
+  "사전규격": "곧 입찰로 나올 사업 · 첨부된 제안요청서(안)로 미리 준비하세요 · 의견마감 지난 공고는 숨김",
   "발주계획": "기관이 올해 발주할 예정인 사업 · 예산과 발주 시기를 미리 파악",
   "학교장터": "학교·교육청의 소액 견적요청 (학교 홍보영상, 행사 촬영 등) · 마감 지난 공고는 숨김",
+  "방송사 공모": "방송사 외주제작·기획안 공모와 방송 제작지원 사업 (KBS·MBC·SBS·EBS·종편·YTN·콘진원 등)",
   "req": "네이버 카페·블로그·뉴스 등에서 찾은 영상 제작 의뢰·업체 모집·공모",
   "star": "★ 표시한 공고",
 };
@@ -161,10 +172,11 @@ const HIGHLIGHT = ["추정가격", "배정예산", "발주금액", "낙찰방법
 function fileExt(name) { const m = /\.([a-z0-9]{2,5})$/i.exec(name || ""); return m ? m[1].toUpperCase() : "파일"; }
 
 function details(n) {
-  const info = Object.entries(n.info || {});
+  const req = (n.info || {})["요청사항"];
+  const info = Object.entries(n.info || {}).filter(([k]) => k !== "요청사항");
   const files = n.files || [];
   const ai = aiBlock(n);
-  if (!info.length && !files.length && !ai) return "";
+  if (!info.length && !files.length && !ai && !req) return "";
   const facts = info.map(([k, v]) =>
     `<div class="${HIGHLIGHT.includes(k) ? "hl" : ""}"><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
   const fl = files.map(f =>
@@ -172,6 +184,7 @@ function details(n) {
   const label = [n.analysis && n.analysis.ok && "AI 분석", info.length && "주요내용", files.length && `첨부서류 ${files.length}개`].filter(Boolean).join(" · ");
   return `<details class="more"><summary>▸ ${label}</summary>
     ${info.length ? `<dl class="facts">${facts}</dl>` : ""}
+    ${req ? `<div class="req"><b>요청사항</b>${esc(req)}</div>` : ""}
     ${files.length ? `<ul class="files">${fl}</ul>` : ""}
     ${ai}</details>`;
 }
@@ -235,9 +248,9 @@ function deadlineDate(n) {
   const d = new Date(s);
   return isNaN(d) ? null : d;
 }
-// 사전규격의 마감은 '의견등록 마감'일 뿐이라 지나도 숨기지 않음 (곧 입찰공고가 나올 사업)
+// 마감(사전규격은 의견등록 마감)이 지나면 숨김. 발주계획은 마감일이 없음
 function isExpired(n) {
-  if (n.category === "사전규격" || n.category === "발주계획") return false;
+  if (n.category === "발주계획") return false;
   const d = deadlineDate(n); return d ? d < new Date() : false;
 }
 
@@ -255,13 +268,15 @@ function dday(n) {
 
 function won(a) {
   if (!a) return "";
-  if (a >= 1e8) return (a / 1e8).toFixed(a >= 1e9 ? 0 : 1).replace(/\.0$/, "") + "억원";
-  return Math.round(a / 1e4).toLocaleString() + "만원";
+  const eok = Math.floor(a / 1e8), man = Math.round((a % 1e8) / 1e4);
+  if (eok && man) return `${eok.toLocaleString()}억 ${man.toLocaleString()}만원`;
+  if (eok) return `${eok.toLocaleString()}억원`;
+  return `${man.toLocaleString()}만원`;
 }
 
 function inTab(n, tab) {
   if (tab === "star") return stars.has(n.id);
-  if (tab === "req") return !isG2B(n) && n.category !== "학교장터";
+  if (tab === "req") return n.category === "제작 의뢰·공모";
   return n.category === tab;
 }
 
@@ -285,9 +300,16 @@ function sorted(list) {
   return list.slice().sort(by);
 }
 
+const AMOUNT_LABEL = { "입찰공고": "추정가격", "사전규격": "배정예산", "발주계획": "발주금액" };
+
+function isHighlight(n) {
+  const t = (n.title || "").replace(/\s/g, "");
+  return (DATA.highlight || ["홍보영상", "홍보동영상"]).some(k => k && t.includes(k.replace(/\s/g, "")));
+}
+
 function card(n) {
   const own = isG2B(n) || n.category === "학교장터";
-  const stageCls = own ? "st-" + n.category : "st-req";
+  const stageCls = own ? "st-" + n.category : n.category === "방송사 공모" ? "st-방송사" : "st-req";
   const stageLabel = own ? n.category : n.source_name;
   const isNew = n.first_seen && n.first_seen.slice(0, 10) === latestRun.slice(0, 10);
   const meta = [
@@ -295,21 +317,22 @@ function card(n) {
     n.posted && `<span>게시 ${esc(n.posted)}</span>`,
     n.deadline && `<span>마감 ${esc(n.deadline)}</span>`,
     (isG2B(n) || n.category === "학교장터") && n.kind && `<span>${esc(n.kind)}</span>`,
-    n.amount && `<span class="amt">${won(n.amount)}</span>`,
     n.analysis && n.analysis.ok && n.analysis.period && `<span class="badge-ai">기간 ${esc(n.analysis.period)}</span>`,
     n.analysis && n.analysis.ok && n.analysis.tech_price_ratio && `<span class="badge-ai">기술:가격 ${esc(n.analysis.tech_price_ratio)}</span>`,
   ].filter(Boolean).join("");
-  return `<div class="item ${isExpired(n) ? "expired" : ""}">
+  const hl = isHighlight(n);
+  return `<div class="item ${isExpired(n) ? "expired" : ""} ${hl ? "hl" : ""}">
     <a class="t" href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.title)}</a>
     <div class="side">
       <span class="badge ${stageCls}">${esc(stageLabel)}</span>
+      ${n.amount ? `<span class="money"><small>${AMOUNT_LABEL[n.category] || "금액"}</small>${won(n.amount)}</span>` : ""}
       ${dday(n)}
       <span class="acts">
         <button class="star ${stars.has(n.id) ? "on" : ""}" data-star="${esc(n.id)}" title="관심">★</button>
         <button data-hide="${esc(n.id)}" title="${hidden.has(n.id) ? "다시 보기" : "숨기기"}">${hidden.has(n.id) ? "↺" : "✕"}</button>
       </span>
     </div>
-    <div class="meta">${isNew ? '<span class="new">NEW</span>' : ""}${meta}${stageLink(n)}</div>
+    <div class="meta">${hl ? '<span class="hl-tag">홍보영상</span>' : ""}${isNew ? '<span class="new">NEW</span>' : ""}${meta}${stageLink(n)}</div>
     ${stageCls === "st-req" && n.kind ? `<div class="desc">${esc(n.kind)}</div>` : ""}
     ${details(n)}
   </div>`;

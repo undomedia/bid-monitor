@@ -1,0 +1,39 @@
+name: 화면 갱신
+
+# 화면(web/)이나 설정이 바뀌면 수집을 기다리지 않고 대시보드(docs/)에 바로 반영한다.
+on:
+  push:
+    branches: [main]
+    paths: ["web/**", "config/**", "monitor/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collect
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: 대시보드 다시 만들기 (수집 없이)
+        env:
+          TZ: Asia/Seoul
+        run: python -m monitor build
+      - name: 결과 저장
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs
+          git diff --cached --quiet || git commit -m "화면 갱신 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')"
+          git pull --rebase -X theirs origin main
+          git push
