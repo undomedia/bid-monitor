@@ -1,3 +1,8 @@
-# 5차 점검: KBS 외주공모시스템 (자바스크립트 화면 → 브라우저로 띄워서 확인)
+# 공모전 모음 사이트 점검 (영상/UCC 분야)
+https://www.wevity.com/
+https://www.wevity.com/?c=find&s=1&gub=1
+https://www.thinkcontest.com/
+https://www.contestkorea.com/
+https://www.contestkorea.com/sub/list.php?int_gbn=1
+https://www.all-con.co.kr/
 render https://op.kbs.co.kr/board/boardListMain
-# 재시도 (제한 시간 연장)
