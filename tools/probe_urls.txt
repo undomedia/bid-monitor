@@ -6,3 +6,4 @@ https://www.contestkorea.com/
 https://www.contestkorea.com/sub/list.php?int_gbn=1
 https://www.all-con.co.kr/
 render https://op.kbs.co.kr/board/boardListMain
+# 재시도: 브라우저 부가 설치 제외

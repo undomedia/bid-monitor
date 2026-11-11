@@ -23,7 +23,8 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt
       - name: 브라우저 설치 (자바스크립트 사이트 점검용)
-        run: pip install playwright && python -m playwright install --with-deps chromium
+        continue-on-error: true          # 실패해도 일반 사이트 점검은 계속
+        run: pip install playwright && python -m playwright install chromium
       - run: python tools/probe_sites.py tools/probe_urls.txt
       - uses: actions/upload-artifact@v4
         with:
