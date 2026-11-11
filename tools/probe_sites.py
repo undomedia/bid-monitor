@@ -1,0 +1,73 @@
+"""사이트 점검: 방송사 공모 게시판 후보를 열어 보고 무엇이 보이는지 기록한다.
+
+GitHub Actions(인터넷이 열린 환경)에서 실행해 결과를 로그와 probe_report.md 로 남긴다.
+  python tools/probe_sites.py tools/probe_urls.txt
+"""
+from __future__ import annotations
+
+import re
+import sys
+from pathlib import Path
+from urllib.parse import urljoin
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from bs4 import BeautifulSoup  # noqa: E402
+
+from monitor.collectors import board  # noqa: E402
+from monitor.collectors.base import clean, session  # noqa: E402
+
+LINK_WORDS = re.compile(r"공지|공고|공모|외주|제작사|협력|상생|기획안|입찰|알림|notice|board|bbs", re.I)
+
+
+def probe(url: str) -> str:
+    out = [f"\n## {url}"]
+    try:
+        r = session().get(url, timeout=30)
+        if not r.encoding or r.encoding.lower() == "iso-8859-1":
+            r.encoding = r.apparent_encoding
+        html = r.text
+        soup = BeautifulSoup(html, "html.parser")
+        title = clean(soup.title.get_text()) if soup.title else ""
+        out.append(f"- 상태 {r.status_code}, 최종주소 {r.url}, 크기 {len(html):,}, 제목 '{title}'")
+    except Exception as e:  # noqa: BLE001
+        out.append(f"- 실패: {type(e).__name__}: {e}")
+        return "\n".join(out)
+
+    items = board.extract(html, {"id": "p", "url": r.url})
+    out.append(f"- 자동 인식 게시글 {len(items)}건")
+    for n in items[:12]:
+        out.append(f"  - {n.posted or '----------'} | {n.title[:70]} | {n.url[:120]}")
+
+    links, seen = [], set()
+    for a in soup.find_all("a"):
+        text = clean(a.get_text()) or clean(a.get("title"))
+        href = a.get("href") or ""
+        onclick = a.get("onclick") or ""
+        if not text or len(text) > 60:
+            continue
+        if LINK_WORDS.search(text) or LINK_WORDS.search(href):
+            key = (text, href)
+            if key in seen:
+                continue
+            seen.add(key)
+            target = urljoin(r.url, href) if href and not href.startswith("javascript") else (href + " " + onclick)
+            links.append(f"  - [{text}] {target[:160]}")
+    out.append(f"- 관련 링크 {len(links)}개")
+    out.extend(links[:40])
+    scripts = re.findall(r"""['"]([^'"]*(?:list|List|bbs|board|notice)[^'"]*\.(?:do|php|jsp|json)[^'"]*)['"]""", html)
+    if scripts:
+        out.append("- 페이지 안 목록 주소 후보: " + ", ".join(sorted(set(scripts))[:15]))
+    return "\n".join(out)
+
+
+def main() -> None:
+    urls = [l.strip() for l in Path(sys.argv[1]).read_text(encoding="utf-8").splitlines()
+            if l.strip() and not l.startswith("#")]
+    report = "# 사이트 점검 결과\n" + "\n".join(probe(u) for u in urls)
+    Path("probe_report.md").write_text(report, encoding="utf-8")
+    print(report)
+
+
+if __name__ == "__main__":
+    main()

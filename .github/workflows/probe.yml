@@ -1,0 +1,29 @@
+name: 사이트 점검
+
+# 방송사 공모 게시판 후보 목록(tools/probe_urls.txt)이 바뀌면 자동으로 열어 보고 결과를 기록한다.
+# 수집·알림·대시보드에는 영향을 주지 않는다 (읽기만 함).
+on:
+  push:
+    branches: [main]
+    paths: ["tools/probe_urls.txt", "tools/probe_sites.py"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python tools/probe_sites.py tools/probe_urls.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: probe-report
+          path: probe_report.md
