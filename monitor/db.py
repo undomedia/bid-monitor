@@ -53,6 +53,15 @@ class Store:
             )
             if cur.rowcount:
                 new.append(n)
+            elif n.files or n.info:
+                # 이미 있는 공고: 처음 본 시각은 유지하고 첨부파일·상세정보만 최신으로
+                row = self.conn.execute("SELECT data FROM notices WHERE id=?", (n.id,)).fetchone()
+                if row:
+                    old = json.loads(row[0])
+                    if old.get("files") != n.files or old.get("info") != n.info:
+                        old["files"], old["info"] = n.files, n.info
+                        self.conn.execute("UPDATE notices SET data=? WHERE id=?",
+                                          (json.dumps(old, ensure_ascii=False), n.id))
         self.conn.commit()
         return new
 

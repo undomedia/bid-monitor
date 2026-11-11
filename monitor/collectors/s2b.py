@@ -61,6 +61,64 @@ def parse(html: str, source: dict) -> list[Notice]:
     return out
 
 
+FILE_URL = "https://www.s2b.kr/S2BNCustomer/S2B/FileDownload.jsp?FILENAME={name}&UNIQUEFILENAME={uniq}&gubun=estimation"
+
+
+def _fmt_ymd(v: str) -> str:
+    return f"{v[:4]}-{v[4:6]}-{v[6:8]}" if len(v) >= 8 and v[:8].isdigit() else v
+
+
+def parse_detail(html: str) -> tuple[list[dict], dict]:
+    """상세 화면에서 첨부파일과 핵심 정보를 꺼낸다."""
+    from urllib.parse import quote
+    soup = BeautifulSoup(html, "html.parser")
+    files = []
+    for name, uniq in re.findall(r"fileDownload\('([^']+)'\s*,\s*'([^']*)'\)", html):
+        files.append({"name": name, "url": FILE_URL.format(
+            name=quote(name, encoding="cp949"), uniq=quote(uniq or name, encoding="cp949"))})
+
+    info: dict[str, str] = {}
+    m = re.search(r"var\s+contractDay\s*=\s*'(\d{8})~(\d{8})'", html)
+    if m:
+        info["계약기간"] = f"{_fmt_ymd(m.group(1))} ~ {_fmt_ymd(m.group(2))}"
+    for td in soup.select("td.td_dark_blue"):
+        label = clean(td.get_text(" "))
+        val = td.find_next_sibling("td")
+        if val is None:
+            continue
+        if label.startswith("분류"):
+            opt = val.select_one("select option[selected]")
+            if opt:
+                info["분류"] = clean(opt.get_text())
+        elif label.startswith("계약상대자결정"):
+            info["업체 선정"] = clean(val.get_text(" "))
+        elif label.startswith("납품장소"):
+            loc = val.select_one("input[name='tcmu100VO.deliveryLocation']")
+            if loc and loc.get("value"):
+                info["납품장소"] = clean(loc["value"])
+        elif label.startswith("주요 요청사항"):
+            ta = val.find("textarea")
+            text = (ta.get_text() if ta else val.get_text("\n")).strip()
+            if text:
+                info["요청사항"] = re.sub(r"\n{3,}", "\n\n", text)[:1500]
+    return files, info
+
+
+def download(url: str) -> tuple[str, bytes]:
+    """첨부파일 받기. 학교장터는 중간 페이지가 POST 로 한 번 더 넘기는 구조라 그 단계를 대신 수행한다."""
+    from urllib.parse import parse_qs, urlparse
+    q = parse_qs(urlparse(url).query, encoding="cp949")
+    name = (q.get("FILENAME") or ["file"])[0]
+    uniq = (q.get("UNIQUEFILENAME") or [name])[0]
+    data = {"forwardName": "download", "file_name": name, "path_from": "estimation",
+            "manage_file_name": uniq, "sub_dir": ""}
+    r = session().post("https://www.s2b.kr/S2BNCustomer/commonFile.do",
+                       data=urlencode(data, encoding="cp949"), timeout=60,
+                       headers={"Content-Type": "application/x-www-form-urlencoded"})
+    r.raise_for_status()
+    return name, r.content
+
+
 def collect(source: dict, lookback_days: float | None = None) -> list[Notice]:
     days = lookback_days if lookback_days is not None else float(source.get("lookback_days", 7))
     days = min(days, 89)                                  # 학교장터는 3개월까지만 조회 가능
@@ -80,4 +138,13 @@ def collect(source: dict, lookback_days: float | None = None) -> list[Notice]:
             if len(rows) < 10:                            # 한 페이지 10건
                 break
             time.sleep(0.5)                               # 사이트에 부담 주지 않도록
+    if source.get("details", True):
+        for n in out[: int(source.get("max_details", 80))]:
+            try:
+                r = session().get(n.url, timeout=30)
+                r.encoding = "cp949"
+                n.files, n.info = parse_detail(r.text)
+            except Exception:  # noqa: BLE001 — 상세를 못 읽어도 목록은 유지
+                pass
+            time.sleep(0.3)
     return out

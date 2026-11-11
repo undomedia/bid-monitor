@@ -227,3 +227,30 @@ def test_board_url_contains_and_title_strip():
            "title_strip": r"\s*20\d\d-\d\d-\d\d\s*조회\s*[\d,]+\s*$"}
     items = board.extract(html, src)
     assert [n.title for n in items] == ["콘텐츠 제작사 공모"]
+
+
+def test_s2b_detail_files_and_info():
+    from monitor.collectors import s2b
+    html = """<script>var contractDay = '20261113~20261120';</script>
+    <table><tr><td class="td_dark_blue">분류</td><td><select><option>행사</option><option selected>기타 일반용역</option></select></td></tr>
+    <tr><td class="td_dark_blue">주요 요청사항</td><td><textarea>1. 영상 편집 제작: 5분
+ - 컷편집, 색보정</textarea></td></tr>
+    <tr><td class="td_dark_blue">관련서류첨부</td><td>
+      <a href="javascript:fileDownload('행사 영상 자막.pptx','20261111165541606813.pptx');">[행사 영상 자막.pptx]</a></td></tr></table>"""
+    files, info = s2b.parse_detail(html)
+    assert files[0]["name"] == "행사 영상 자막.pptx"
+    assert "UNIQUEFILENAME=20261111165541606813.pptx" in files[0]["url"]
+    assert info["계약기간"] == "2026-11-13 ~ 2026-11-20" and info["분류"] == "기타 일반용역"
+    assert info["요청사항"].startswith("1. 영상 편집 제작")
+
+
+def test_store_updates_files_for_existing(tmp_path):
+    from monitor.models import Notice
+    st = Store(tmp_path / "d.db")
+    n = Notice(source_id="s2b", source_name="학교장터", category="학교장터", title="홍보영상 제작", url="u", uid="1")
+    assert len(st.add([n], "2026-11-11 10:00")) == 1
+    n2 = Notice(source_id="s2b", source_name="학교장터", category="학교장터", title="홍보영상 제작", url="u", uid="1",
+                files=[{"name": "a.hwp", "url": "x"}], info={"계약기간": "2026-11-13 ~ 2026-11-20"})
+    assert st.add([n2], "2026-11-12 07:00") == []          # 새 공고 아님 → 알림 없음
+    row = st.recent(30)[0]
+    assert row["files"][0]["name"] == "a.hwp" and row["first_seen"] == "2026-11-11 10:00"

@@ -81,8 +81,13 @@ def load_docs(notice: dict, max_files: int = 6, max_bytes: int = 30_000_000) -> 
     docs, errors = [], []
     for f in _pick_files(notice.get("files", []), max_files):
         try:
-            r = session().get(f["url"], timeout=60)
-            r.raise_for_status()
+            if "s2b.kr" in f["url"] and "FileDownload.jsp" in f["url"]:
+                from .collectors.s2b import download
+                _, content = download(f["url"])
+                r = type("R", (), {"content": content, "headers": {}})()
+            else:
+                r = session().get(f["url"], timeout=60)
+                r.raise_for_status()
             if len(r.content) > max_bytes:
                 errors.append(f"{f['name']}: 파일이 너무 큼")
                 continue

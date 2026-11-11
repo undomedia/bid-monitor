@@ -85,6 +85,8 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 .facts dt { color:var(--sub); flex:0 0 auto; margin:0 }
 .facts dd { margin:0; font-weight:600; overflow-wrap:anywhere }
 .facts .hl dd { color:var(--accent) }
+.req { margin-top:8px; background:var(--bg); border-radius:8px; padding:10px 12px; font-size:13px; white-space:pre-wrap; line-height:1.6 }
+.req b { display:block; color:var(--sub); font-weight:600; margin-bottom:2px }
 .files { margin:10px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:4px; font-size:13px }
 .files a { color:var(--text); text-decoration:none; display:inline-flex; gap:6px; align-items:baseline }
 .files a:hover { color:var(--accent); text-decoration:underline }
@@ -170,10 +172,11 @@ const HIGHLIGHT = ["추정가격", "배정예산", "발주금액", "낙찰방법
 function fileExt(name) { const m = /\.([a-z0-9]{2,5})$/i.exec(name || ""); return m ? m[1].toUpperCase() : "파일"; }
 
 function details(n) {
-  const info = Object.entries(n.info || {});
+  const req = (n.info || {})["요청사항"];
+  const info = Object.entries(n.info || {}).filter(([k]) => k !== "요청사항");
   const files = n.files || [];
   const ai = aiBlock(n);
-  if (!info.length && !files.length && !ai) return "";
+  if (!info.length && !files.length && !ai && !req) return "";
   const facts = info.map(([k, v]) =>
     `<div class="${HIGHLIGHT.includes(k) ? "hl" : ""}"><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
   const fl = files.map(f =>
@@ -181,6 +184,7 @@ function details(n) {
   const label = [n.analysis && n.analysis.ok && "AI 분석", info.length && "주요내용", files.length && `첨부서류 ${files.length}개`].filter(Boolean).join(" · ");
   return `<details class="more"><summary>▸ ${label}</summary>
     ${info.length ? `<dl class="facts">${facts}</dl>` : ""}
+    ${req ? `<div class="req"><b>요청사항</b>${esc(req)}</div>` : ""}
     ${files.length ? `<ul class="files">${fl}</ul>` : ""}
     ${ai}</details>`;
 }
