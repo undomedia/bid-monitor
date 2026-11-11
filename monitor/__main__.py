@@ -54,13 +54,16 @@ def cleanup(store: Store, settings: dict, sources: list[dict]) -> None:
     by_id = {x["id"]: x for x in sources}
     gone = []
     for d in store.recent(int(settings.get("keep_days", 180))):
+        if d["source_id"] not in by_id:          # 사용을 끈 출처(예: 뉴스)의 공고는 정리
+            gone.append(d["id"])
+            continue
         src = by_id.get(d["source_id"], {})
         n = Notice(source_id=d["source_id"], source_name="", category="", title=d["title"], url="")
         if not filters.apply([n], src, settings):
             gone.append(d["id"])
     if gone:
         store.delete(gone)
-        print(f"바뀐 제외어에 따라 기존 공고 {len(gone)}건 정리")
+        print(f"바뀐 제외어·출처 설정에 따라 기존 공고 {len(gone)}건 정리")
 
 
 def build_site(store: Store, settings: dict, sources: list[dict], out_dir: Path) -> None:

@@ -147,7 +147,8 @@ def test_end_to_end(tmp_path, monkeypatch):
     cfg.mkdir()
     (cfg / "settings.yaml").write_text((ROOT / "config" / "settings.yaml").read_text(encoding="utf-8"))
     sources = yaml.safe_load((ROOT / "config" / "sources.yaml").read_text(encoding="utf-8"))
-    sources["sources"] = [s for s in sources["sources"] if s["type"] in ("g2b", "gnews")]
+    sources["sources"] = [dict(s, enabled=True) for s in sources["sources"]
+                          if s["id"] in ("g2b_plan", "g2b_prespec", "g2b_bid", "gnews_requests")]
     (cfg / "sources.yaml").write_text(yaml.safe_dump(sources, allow_unicode=True))
 
     sent = []
