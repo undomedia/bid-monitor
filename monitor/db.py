@@ -84,6 +84,11 @@ class Store:
                           (notice_id, int(done), json.dumps(data, ensure_ascii=False)))
         self.conn.commit()
 
+    def delete(self, ids: list[str]) -> None:
+        self.conn.executemany("DELETE FROM notices WHERE id=?", [(i,) for i in ids])
+        self.conn.executemany("DELETE FROM analysis WHERE id=?", [(i,) for i in ids])
+        self.conn.commit()
+
     def prune(self, keep_days: int) -> int:
         cutoff = (datetime.now() - timedelta(days=keep_days)).strftime("%Y-%m-%d")
         cur = self.conn.execute("DELETE FROM notices WHERE first_seen < ?", (cutoff,))

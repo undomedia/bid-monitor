@@ -102,6 +102,18 @@ def cmd_run(args, settings, sources) -> int:
         store.set_status(src["id"], status)
 
     store.prune(int(settings.get("keep_days", 180)))
+    # 제외어를 바꾸면 이미 저장된 공고에도 적용 (대시보드에서 바로 사라지게)
+    from .models import Notice
+    by_id = {x["id"]: x for x in sources}
+    gone = []
+    for d in store.recent(int(settings.get("keep_days", 180))):
+        src = by_id.get(d["source_id"], {})
+        n = Notice(source_id=d["source_id"], source_name="", category="", title=d["title"], url="")
+        if not filters.apply([n], src, settings):
+            gone.append(d["id"])
+    if gone:
+        store.delete(gone)
+        print(f"바뀐 제외어에 따라 기존 공고 {len(gone)}건 정리")
     if not args.no_analyze:
         analyze.run(store, settings, now)
     build_site(store, settings, sources, ROOT / settings.get("site_dir", "docs"))

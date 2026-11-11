@@ -25,11 +25,11 @@ def apply(notices: list[Notice], source: dict, settings: dict) -> list[Notice]:
 
     out = []
     strong = settings.get("strong_keywords", [])
-    hard = ["CCTV", "폐쇄회로", "영상정보처리"]   # 이건 영상제작과 같이 있어도 제외
+    hard = settings.get("hard_exclude_keywords", ["CCTV", "폐쇄회로", "영상정보처리"])
     for n in notices:
         if not n.title:
             continue
-        if match(n.title, excludes) and (match(n.title, hard) or not match(n.title, strong)):
+        if match(n.title, hard) or (match(n.title, excludes) and not match(n.title, strong)):
             continue
         n.matched = match(n.title, keywords)
         if mode == "keywords" and not n.matched:

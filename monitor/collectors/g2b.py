@@ -279,6 +279,9 @@ def collect(source: dict, lookback_days: float | None = None) -> list[Notice]:
                 m = re.search(r"<(?:returnAuthMsg|resultMsg|errMsg)>([^<]+)<", r.text)
                 raise RuntimeError(f"API 오류: {m.group(1) if m else r.text[:200]}")
             items, total = _items(payload)
+            if page == 1 and t == start:
+                # 실행 기록용: 원본 건수와 항목 이름(값은 기록하지 않음)
+                print(f"    [{defaults['category']}] 원본 {total}건, 항목: {sorted(items[0].keys())[:40] if items else '-'}")
             notices.extend(parse(it, src) for it in items)
             if page * rows >= total or not items:
                 break
