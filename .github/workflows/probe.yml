@@ -22,6 +22,8 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt
+      - name: 브라우저 설치 (자바스크립트 사이트 점검용)
+        run: pip install playwright && python -m playwright install --with-deps chromium
       - run: python tools/probe_sites.py tools/probe_urls.txt
       - uses: actions/upload-artifact@v4
         with:

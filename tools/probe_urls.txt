@@ -1,3 +1,2 @@
-# 4차 점검: 사용자가 알려준 KBS 외주제작 관련 사이트
-https://op.kbs.co.kr/board/boardListMain
-https://oeju.kbs.co.kr/OejuMain.aspx
+# 5차 점검: KBS 외주공모시스템 (자바스크립트 화면 → 브라우저로 띄워서 확인)
+render https://op.kbs.co.kr/board/boardListMain

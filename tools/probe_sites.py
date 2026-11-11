@@ -20,10 +20,21 @@ from monitor.collectors.base import clean, session  # noqa: E402
 LINK_WORDS = re.compile(r"공지|공고|공모|외주|제작사|협력|상생|기획안|입찰|알림|notice|board|bbs", re.I)
 
 
+class _Rendered:
+    def __init__(self, url, html):
+        self.url, self.text, self.status_code, self.encoding = url, html, 200, "utf-8"
+
+
 def probe(url: str) -> str:
-    out = [f"\n## {url}"]
+    render = url.startswith("render ")
+    url = url.removeprefix("render ").strip()
+    out = [f"\n## {url}{' (브라우저 렌더링)' if render else ''}"]
     try:
-        r = session().get(url, timeout=30)
+        if render:
+            src = {"url": url, "render": True}
+            r = _Rendered(url, board.fetch_html(src))
+        else:
+            r = session().get(url, timeout=30)
         if not r.encoding or r.encoding.lower() == "iso-8859-1":
             r.encoding = r.apparent_encoding
         html = r.text

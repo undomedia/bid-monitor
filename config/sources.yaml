@@ -96,6 +96,15 @@ sources:
     exclude: *bc_ex
     max_age_days: 120
     allow_empty: true
+  - id: kbs_oeju
+    type: board
+    name: KBS 외주제작
+    category: 방송사 공모
+    url: https://oeju.kbs.co.kr/OejuMain.aspx
+    filter: all
+    exclude: [결과, 심사, 합격, 선정, 메뉴얼, 매뉴얼, 개인정보, 입고]
+    max_age_days: 120
+    allow_empty: true
   - id: yonhap_notice
     type: board
     name: 연합뉴스TV
