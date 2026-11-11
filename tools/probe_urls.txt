@@ -1,2 +1,3 @@
 # 5차 점검: KBS 외주공모시스템 (자바스크립트 화면 → 브라우저로 띄워서 확인)
 render https://op.kbs.co.kr/board/boardListMain
+# 재시도 (제한 시간 연장)
