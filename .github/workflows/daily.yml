@@ -1,0 +1,62 @@
+name: 공고 수집
+
+on:
+  schedule:
+    # 한국시간 07:10 / 12:10 / 17:40 (UTC 기준으로 9시간 빼서 적음, 평일+주말)
+    - cron: "10 22 * * *"
+    - cron: "10 3 * * *"
+    - cron: "40 8 * * *"
+  workflow_dispatch:        # Actions 탭에서 '지금 실행' 버튼
+    inputs:
+      days:
+        description: "조회 기간(일). 처음 설치 시 60 정도로 과거 공고 채우기"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collect
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: 수집 + 대시보드 + 알림
+        env:
+          TZ: Asia/Seoul
+          G2B_SERVICE_KEY: ${{ secrets.G2B_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          DASHBOARD_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+        run: |
+          if [ -n "${{ github.event.inputs.days }}" ]; then
+            python -m monitor run --days "${{ github.event.inputs.days }}"
+          else
+            python -m monitor run
+          fi
+
+      - name: 결과 저장
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data docs
+          git diff --cached --quiet || git commit -m "공고 수집 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')"
+          git push

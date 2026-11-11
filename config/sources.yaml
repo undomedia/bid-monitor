@@ -1,0 +1,73 @@
+# ───────── 수집 대상 ─────────
+# enabled: false 로 끄고 켤 수 있습니다.
+
+sources:
+
+  # ═══ 영역 1. 나라장터 (영상제작 '용역') ═══
+  # 공공데이터포털에서 아래 3개 API를 활용신청 → 인증키를 G2B_SERVICE_KEY 에 설정
+  - id: g2b_plan
+    type: g2b
+    name: 나라장터 발주계획
+    stage: plan          # 발주계획
+    lookback_days: 7
+
+  - id: g2b_prespec
+    type: g2b
+    name: 나라장터 사전규격
+    stage: prespec       # 사전규격
+    lookback_days: 3
+
+  - id: g2b_bid
+    type: g2b
+    name: 나라장터 입찰공고
+    stage: bid           # 입찰공고
+    lookback_days: 3
+
+  # ═══ 학교장터 (학교·교육청 소액 견적요청) — 키 필요 없음 ═══
+  - id: s2b
+    type: s2b
+    name: 학교장터
+    category: 학교장터
+    item: 용역
+    lookback_days: 7
+    queries: [영상, 촬영, 유튜브, 숏폼, 다큐, 애니메이션, 뮤직비디오]
+
+  # ═══ 영역 2. 제작 의뢰·공모 (입찰 외) ═══
+
+  # 네이버 카페·블로그·뉴스 검색 (NAVER_CLIENT_ID / NAVER_CLIENT_SECRET 필요)
+  - id: naver_requests
+    type: naver
+    name: 네이버 검색
+    targets: [cafe, blog, news]
+    lookback_days: 14
+    queries:
+      - 영상제작 업체 구합니다
+      - 영상 제작 의뢰
+      - 영상 외주 구합니다
+      - 홍보영상 제작 업체 모집
+      - 영상제작 업체 선정
+      - 영상 촬영 업체 구함
+      - 유튜브 영상 제작 업체 찾습니다
+    # 업체 홍보글(“제작해드립니다”)을 거르기 위한 제외어
+    exclude: [해드립니다, 해드려요, 받습니다, 포트폴리오, 후기, 저렴, 할인, 이벤트, 전문업체, 견적문의, 문의주세요, 상담]
+
+  # 구글 뉴스 RSS (키 필요 없음) — 기관의 영상제작 공모·업체 모집 소식
+  - id: gnews_requests
+    type: gnews
+    name: 뉴스
+    lookback_days: 14
+    queries:
+      - 영상제작 업체 모집
+      - 영상 공모전
+      - 홍보영상 제작 공모
+    # 이미 끝난 공모의 결과 기사는 제외
+    exclude: [시상식, 시상, 성료, 수상작, 수상, 마무리, 선정 결과, 성황, 포토, 발표]
+
+  # 특정 게시판을 직접 수집하는 예시 (URL 확인 후 enabled: true)
+  #   먼저 `python -m monitor probe <게시판URL>` 로 제대로 인식되는지 확인하세요.
+  - id: example_board
+    enabled: false
+    type: board
+    name: 예시 기관 견적공고
+    url: https://example.org/board/list
+    filter: keywords      # 영상 관련 글만 (영상 전용 게시판이면 all)

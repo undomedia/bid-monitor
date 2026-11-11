@@ -1,0 +1,2211 @@
+
+
+
+
+
+
+
+
+
+
+
+
+<meta charset="euc-kr">
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=euc-kr" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<link href="/S2BNCustomer/S2B/scrweb/css/s_style_v2.css" rel="stylesheet" type="text/css">
+<link href="/S2BNCustomer/S2B/scrweb/css/style.css" rel="stylesheet" type="text/css">
+<link href="/S2BNCustomer/S2B/scrweb/css/main_style.css" rel="stylesheet" type="text/css">
+<LINK href="/S2BNCustomer/S2B/scrweb/css/school_tender_style.css?v=2" type="text/css" rel="stylesheet">
+<script type="text/javascript" src="/S2BNCustomer/S2B/scrweb/js/jscommon.js"></script>
+<script type="text/javascript" src="/S2BNCustomer/S2B/scrweb/js/my_scr.js"></script>
+
+<!--[if IE]>
+<script type="text/javascript" src="/S2BNCustomer/S2B/scrweb/js/common.js?ver=3"></script> 
+<script type="text/javascript" src="/S2BNCustomer/S2B/scrweb/js/v1/common/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="/S2BNCustomer/S2B/scrweb/js/v1/common/jquery-migrate-1.4.1.min.js"></script>
+<script type="text/javascript" src="/S2BNCustomer/S2B/scrweb/js/calendar.js"></script>
+<script type="text/javascript" src="/S2BNCustomer/S2B/scrweb/js/jindo.all.ns.js" charset="utf-8"></script>
+<![endif]-->
+<!--[if ! IE]> -->
+<script type="text/javascript" src="/S2BNCustomer/S2B/scrweb/js/v1/common/common.js" charset="UTF-8"></script>
+<link href="/S2BNCustomer/S2B/scrweb/css/v1/common/datepicker.min.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="/S2BNCustomer/S2B/scrweb/js/v1/common/jquery-3.5.1.min.js"></script>
+<script type="text/javascript" src="/S2BNCustomer/S2B/scrweb/js/v1/common/jquery-migrate-1.4.1.min.js"></script>
+<script type="text/javascript" src="/S2BNCustomer/S2B/scrweb/js/v1/common/jquery-migrate-3.3.2.min.js"></script>
+<script type="text/javascript" src="/S2BNCustomer/S2B/scrweb/js/v1/common/datepicker.js"></script>
+<!--  <![endif]-->
+<script type="text/javascript" src="/S2BNCustomer/S2B/scrweb/js/v1/common/util.js"></script>
+
+<LINK href="/S2BNCustomer/S2B/scrweb/css/school_tender_style.css" type=text/css rel=stylesheet>
+<title>S2B</title>
+<SCRIPT type="text/javascript">
+//공고일자 CONTROL
+function tender_date_start_sel()
+{
+  	if(document.tcmo001Form.tender_date_start.value != "" && (document.tcmo001Form.tender_date_start.value.length != 8 || !isValidDate(document.tcmo001Form.tender_date_start.value)))
+  	{
+  		alert("선택(입력)하신 일자는 올바른 날짜가 아닙니다.");
+  		document.tcmo001Form.tender_date_start.value = "";
+  		document.tcmo001Form.tender_date_start.focus();
+  		return false;  		
+  	}
+}
+
+//공고일자 CONTROL
+function tender_date_end_sel()
+{
+  	if(document.tcmo001Form.tender_date_end.value != "" && (document.tcmo001Form.tender_date_end.value.length != 8 || !isValidDate(document.tcmo001Form.tender_date_end.value)))
+  	{
+  		alert("선택(입력)하신 일자는 올바른 날짜가 아닙니다.");
+  		document.tcmo001Form.tender_date_end.value = "";
+  		document.tcmo001Form.tender_date_end.focus();
+  		return false;  		
+  	}
+}
+
+//금액 입력시 숫자와 마이너스값만 키입력 받기 위한 함수
+function num_only(obj){
+
+	if(event.keyCode<48 || event.keyCode>57)
+	{
+  		if (event.keyCode == 45) 
+		{
+			if (obj.value == "" || obj.value == null) 
+			{
+				event.returnValue=true;
+				return true;
+			}
+  		}
+		event.returnValue=false;
+		return false;
+	}
+	event.returnValue=true;
+	return true;
+}
+
+//금액 입력시 숫자와 '.', ','값만 키입력 받기 위한 함수
+function num_only1(obj){
+
+	if(event.keyCode<48 || event.keyCode>57)
+	{
+  		if (event.keyCode == 44 || event.keyCode == 46) 
+		{
+			event.returnValue=true;
+			return true;
+  		}
+		event.returnValue=false;
+		return false;
+	}
+	event.returnValue=true;
+	return true;
+}
+
+//입력값에서 콤마를 없앤다.
+//function removeComma(input) {
+//    return input.value.replace(/,/gi,"");
+//}
+
+//입력값이 숫자,콤마(,)로 되어있는지 체크
+function isNumComma1(input) {
+    var chars = ".,0123456789";
+    return containsCharsOnly(input,chars);
+}
+
+//유효하는(존재하는) 날짜인지 체크
+function isValidDate(dt) {
+   var y = Number(dt.substring(0,4));
+   var m = Number(dt.substring(4,6))-1;
+   var d = Number(dt.substring(6,8));
+
+   var end = new Array(31,28,31,30,31,30,31,31,30,31,30,31);
+   if ((y % 4 == 0 && y % 100 != 0) || y % 400 == 0) {
+   	end[1] = 29;
+   }
+   
+   return ((y>2008) && (m>=0) && (m<12) && (d>=1) && (d<=end[m]));
+}
+
+function goList(pageNo)
+{
+	var form = document.tcmo001Form;
+	 
+  	form.pageNo.value = pageNo;
+	form.search_yn.value = "Y";
+	form.forwardName.value = 'list01';
+	form.submit();
+}
+
+function f_detail(estimateCode, estimate_kind)
+{
+	var form = document.tcmo001Form; 
+	
+  	form.estimateCode.value = estimateCode;
+  	form.tender_step_code.value = "A";
+  	form.page_flag.value = "2";
+  	if(estimate_kind == "1")
+		form.forwardName.value = 'view01_1';
+  	else
+  		form.forwardName.value = 'view01_2';
+  	form.submit();
+}
+
+
+function f_search()
+{
+	var form = document.tcmo001Form; 
+	// 연도차이 계수
+	
+	var sd = form.tender_date_start.value.substring(4,8);
+	var ed = form.tender_date_end.value.substring(4,8);
+	var coefficient = (form.tender_date_end.value.substring(0,4) - form.tender_date_start.value.substring(0,4)) * 1200;
+	
+	if((Number(ed) + Number(coefficient) - Number(sd))  > 300){
+		alert('3개월 이상은 조회 하실 수 없습니다.');
+		return;
+	}else{
+		if(form.process_yn.value == "N"){
+			form.process_yn.value = "Y";
+			form.search_yn.value = "Y";
+		  	form.pageNo.value = 1;
+		  	form.forwardName.value = 'list01';
+			form.target = "_self";
+		  	form.submit();
+		}else{
+			alert("조회 중입니다. 잠시만 기다려 주시기 바랍니다.");
+		}
+	}
+
+}
+
+function f_res(form)
+{
+	var form = document.tcmo001Form; 
+	
+	form.tender_sep1.value = "1";
+	form.tender_name.value = "";
+	form.company_name_s.value = "";
+	form.tender_sep2.value = "1";
+	form.tender_date_start.value = 20260801;
+	form.tender_date_end.value = 20261130;
+	form.tender_item.value = "";
+}
+</SCRIPT>
+
+</head>
+
+<body oncontextmenu="return false">
+	<table width="100%" border="0" cellspacing="0" cellpadding="0">
+		<tr>
+      		<td>
+      			<table width="980" border="0" cellspacing="0" cellpadding="0" align="center">
+        			<tr>
+          				<td>
+          					<table width="980" border="0" cellspacing="0" cellpadding="0">
+            					<tr>
+              						<td><!--topmenu start-->
+
+
+
+
+
+<LINK href="/S2BNCustomer/S2B/scrweb/images/favicon.ico/s2b.ico" rel="shortcut icon"  /> 
+
+
+
+ 
+<script language="javascript">
+	function supplierLogout()
+	{
+		var form = document.m_leftForm;
+		form.pageNo.value = 1;
+		form.forwardName.value = 'logOut';
+		actSubmit(form);
+	}
+</script>
+
+
+
+
+
+<script language="javascript">
+
+	function IE_HtmlRewrite(objParent) {
+	  if (window.ActiveXObject && objParent) {
+	   objParent.innerHTML = objParent.innerHTML;
+	  }
+	}
+	function MM_openBrWindow(theURL,winName,features) { //v2.0
+		window.open(theURL,winName,features);
+	}
+
+	function retrieveLogin(){
+		var form = document.m_leftForm;
+		if(form.userCode.value == ''|| form.userCode.value =='아이디'){
+			alert("아이디를 입력하세요");
+			form.userCode.focus();
+			return;
+		}else if(form.pwd.value =='' || form.pwd.value =='비밀번호'){
+			alert("비밀번호를 입력하세요");
+			form.pwd.focus();
+			return;
+		}else{
+			form.pageNo.value = 1;
+			form.forwardName.value = 'login2';
+			form.action="http://www.s2b.kr/S2BNCustomer/m_left.do";
+			//form.action="http://www.s2b.kr/S2BNCustomer/m_left.do";
+			form.submit();
+		}
+	  }
+
+	function retrieveLogOut(){
+		var form = document.m_leftForm;
+		if(confirm("로그아웃 하시겠습니까?")){
+			form.pageNo.value = 1;
+			form.forwardName.value = 'logOut';
+			actSubmit(form);
+		}
+	}
+
+	function checkEnter_sub(){
+		nets=(navigator.appName == 'Netscape')?1:0;
+		expl=(navigator.appName != 'Netscape')?1:0;
+		if(nets) {
+			document.onkeypress=keypresscauseNets_sub;
+			document.captureEvents(Event.KEYPRESS);
+		}
+		if(expl) {
+			document.onkeypress=keypresscauseExpl_sub;
+		}
+	}
+
+	function keypresscauseExpl_sub() {
+		if(expl) {
+			if (event.keyCode == 13) {
+			retrieveLogin();		}
+		}
+	}
+
+	function keypresscauseNets_sub(e) {
+		if(nets) {
+			if(e.which == 13) {
+				retrieve();
+			}
+		}
+	}
+
+	function removeid(){
+		var form = document.m_leftForm;
+		if(form.userCode.value == '분회코드입력'){
+			form.userCode.value = '';
+		}
+	}
+
+	// 비밀번호 입력칸 지우기
+	function deleteBox(){
+		var form = document.m_leftForm;
+		form.elements['pwd'].value="";
+	}
+
+	function openWinCenter(url,wname, wopt) {
+		var newopt = "", wHeight = 0, wWidth = 0;
+		if (wopt != undefined) {
+			var woptlist = wopt.replace(/ /g, "").split(",");
+			for (var i in woptlist) {
+				if (woptlist[i].match(/^height=/i)) {
+					wHeight = parseInt(woptlist[i].substr(7),10);
+					if (!isNaN(wHeight)) newopt += "top=" + Math.floor((screen.availHeight - wHeight) / 2) + ",";
+				}
+				if (woptlist[i].match(/^width=/i)) {
+					wWidth = parseInt(woptlist[i].substr(6),10);
+					if (!isNaN(wWidth)) newopt += "left=" + Math.floor((screen.availWidth - wWidth) / 2) + ",";
+				}
+			}
+		}
+		return window.open(url, wname, newopt + wopt);
+	}
+
+	function goMain(){
+		window.document.location.href = "/S2BNCustomer/S2B/index.jsp";
+	}
+
+	function modifyInfo(){
+		window.document.location.href = 'https://www.s2b.kr/S2BNCustomer/customer900.do?forwardName=doEdit';
+	}
+
+	function openInfoWin(){
+		var url = "/S2BNCustomer/S2B/scrweb/common/newMemberPopup.jsp";
+		window.open(url, "mainPopup", "width=518, height=570");
+	}
+
+	function userCode(usercode) {
+		//alert("받은 코드 " + usercode);
+		form = document.m_leftForm;
+		form.userCode.value = usercode;
+		form.pwd.value = usercode;
+	}
+
+	// 교육기관 가입동의 및 회원가입확인 화면으로 이동
+	function goSchoolMemberAgreement(){
+		var form = document.m_leftForm;
+//		form.forwardName.value = "schoolMember";
+//		form.gubun.value = "schoolBunhoe";
+//		form.elements['m_leftVO.companyCode'].value = '';
+//		form.elements['m_leftVO.userCode'].value = '' ;
+		form.action="http://www.s2b.kr/S2BNCustomer/checkSchool.do";
+		actSubmit(form);
+	}
+	function go_G_event1(fn)
+  	{
+  		
+  		window.location.href = "http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName="+fn+"&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName="+fn;
+  		
+	}
+	function play_category(){
+		var obj = document.getElementById("AllShoppingWrap");
+		
+		if(obj.style.display == 'block'){
+			obj.style.display = 'none';
+		}else{
+			obj.style.display = 'block';
+		}
+				
+	}
+</script>
+
+<script language="javascript" src="/S2BNCustomer/S2B/scrweb/js/link_school.js"></script>
+<LINK href="/S2BNCustomer/S2B/scrweb/css/school_tender_style.css" type=text/css rel=stylesheet>
+
+
+<table width="980" border="0" cellspacing="0" cellpadding="0">
+
+		<script lanugage="javascript">
+
+// Home
+top_home="/";
+
+
+//  로그인전
+pre_login1="http://www.s2b.kr/S2BNCustomer/customer600.do?forwardName=board&division=1";    // 공지사항
+pre_login2="http://www.s2b.kr/S2BNCustomer/Tcmu100NoSession.do?forwardName=list2";    //견적공고
+pre_login3="http://www.s2b.kr/S2BNCustomer/customer600.do?forwardName=board&division=3";    //교육뉴스
+pre_login4="http://www.s2b.kr/S2BNCustomer/customer600.do?forwardName=board&division=6";    //자유게시판
+pre_login5="http://www.s2b.kr/S2BNCustomer/customer600.do?forwardName=board&division=a";    //자료실
+pre_login6="http://www.s2b.kr/S2BNCustomer/customer600.do?forwardName=board&division=5";    //이벤트행사
+pre_login7="#";    //공시
+pre_login8="http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/b_info1.jsp";    // 종합이용안내
+
+pre_login_sub1="http://www.s2b.kr/S2BNCustomer/customer600.do?forwardName=board&division=a";  //자료실 입법예고
+pre_login_sub2="http://www.s2b.kr/S2BNCustomer/customer600.do?forwardName=board&division=b";  //자료실 법령집
+pre_login_sub3="http://www.s2b.kr/S2BNCustomer/customer600.do?forwardName=board&division=c";  //자료실 교권사건판례집
+pre_login_sub4="http://www.s2b.kr/S2BNCustomer/customer600.do?forwardName=board&division=d";  //자료실 행정실무편람
+
+pre_login_sub5="http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/b_info1.jsp";  //종합이용안내>이용안내
+pre_login_sub6="http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/b_info2.jsp";  //종합이용안내>이용안내
+pre_login_sub7="http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/b_info3.jsp";  //종합이용안내>이용안내
+pre_login_sub8="http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/b_info4.jsp";  //종합이용안내>이용안내
+pre_login_sub9="";  //종합이용안내>이용안내
+pre_login_sub10="";  //종합이용안내>이용안내
+edu_guide_sub12 = "http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/s2b_use_info01.jsp";
+
+
+//교육기관
+// MyDesk
+edu_mydesk="http://www.s2b.kr/S2BNCustomer/Tmmu200.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tmmu200.do"; // 진행중 계약
+edu_mydesk_sub1="http://www.s2b.kr/S2BNCustomer/Tmmu200.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tmmu200.do";  // 진행중 계약
+edu_mydesk_sub2="http://www.s2b.kr/S2BNCustomer/Tmmu300.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tmmu300.do";  // 완료된 계약
+edu_mydesk_sub3="http://www.s2b.kr/S2BNCustomer/Tmmu400.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tmmu400.do";  // 전자계약 실적
+edu_mydesk_sub4="https://www.s2b.kr/S2BNCustomer/customer900.do?fromFlag=menuModify";  // 회원정보 수정
+edu_mydesk_sub5="http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/welfare.jsp";  // 복지기금
+sub0109	="http://www.s2b.kr/S2BNCustomer/Tmmu700.do";  // 에듀파인연계현황
+
+//복지기금 by 2010.01.28 by heahyeuk
+mov_banner = "http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/welfare.jsp";
+//구매대행 by 2010.01.28 by heahyeuk
+event_buy = "http://www.s2b.kr/S2BNCustomer/Spma001.do?forwardName=spma&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Spma001.do?forwardName=spma";
+
+//기획전 링크 2010.06.22 이후 
+//goEventPage() 함수에 링크 URL을 등록  해야 합니다.... 
+spc_spcmain = "javascript:goEventPage('eventMall')";
+spc_spc01 = "javascript:goEventPage('list_preschool')";
+spc_spc02 = "javascript:goEventPage('list_legal')";
+
+//이벤트 링크 2010.06.22 이후
+evt_evtmain = "javascript:goEventPage('eventMain')";
+evt_evt01 ="javascript:goEventPage('archi_event')";
+evt_evt02 ="javascript:goEventPage('join_event')";
+
+
+//견적구매
+edu_estimate="http://www.s2b.kr/S2BNCustomer/tcmu100.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/tcmu100.do"; // 견적요청
+edu_estimate_sub1="http://www.s2b.kr/S2BNCustomer/tcmu100.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/tcmu100.do";  // 견적요청
+edu_estimate_sub2="http://www.s2b.kr/S2BNCustomer/Tcmu200.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tcmu200.do";  // 받은견적
+edu_estimate_sub3="http://www.s2b.kr/S2BNCustomer/Tcmu300.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tcmu300.do";  // 주문목록
+edu_estimate_sub4="http://www.s2b.kr/S2BNCustomer/Tcmu500.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tcmu500.do";  // 검수목록
+edu_estimate_sub5="http://www.s2b.kr/S2BNCustomer/Tcmu600.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tcmu600.do";  // 결제목록
+edu_estimate_sub6="Manual01";  // 매뉴얼
+
+
+//바로구매
+edu_shop="http://www.s2b.kr/S2BNCustomer/Tomu200.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/S2B/scrweb/ssmu/tomu/searchengine/s2bCustomerSearch.jsp";   // 물품찾기
+edu_shop_sub1="http://www.s2b.kr/S2BNCustomer/Tomu200.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/S2B/scrweb/ssmu/tomu/searchengine/s2bCustomerSearch.jsp";   // 물품찾기
+edu_shop_sub2="http://www.s2b.kr/S2BNCustomer/Tomu700.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tomu700.do";    // 품의목록
+edu_shop_sub3="http://www.s2b.kr/S2BNCustomer/Tpmu000.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tpmu000.do";    // 주문목록
+edu_shop_sub4="http://www.s2b.kr/S2BNCustomer/Tpmu100.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tpmu100.do";    // 검수목록
+edu_shop_sub5="http://www.s2b.kr/S2BNCustomer/Tpmu300.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tpmu300.do";    // 결제목록
+edu_shop_sub6="Manual03";    // 매뉴얼
+edu_shop_sub7="http://www.s2b.kr/S2BNCustomer/Tomu400.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tomu400.do?forwardName=list";    // 장바구니
+
+//바로구매
+//운영은 검색 엔진을 통해서 바로구매 물품 검색한다. aoddydrl119@s2b.kr
+
+edu_shop="http://www.s2b.kr/S2BNCustomer/Tomu200.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tomu200.do";   // 물품찾기
+edu_shop_sub1="http://www.s2b.kr/S2BNCustomer/Tomu200.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tomu200.do";   // 물품찾기
+
+
+edu_shop_sub2="http://www.s2b.kr/S2BNCustomer/Tgmu130.do?forwardName=compare_list&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tgmu130.do?forwardName=compare_list";   // 비교담기
+edu_shop_sub3="http://www.s2b.kr/S2BNCustomer/Tgmu130.do?forwardName=interest_list&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tgmu130.do?forwardName=interest_list";   // 관심물품
+edu_shop_sub4="http://www.s2b.kr/S2BNCustomer/Tomu400.do?forwardName=list&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tomu400.do?forwardName=list";    // 장바구니
+edu_shop_sub5="http://www.s2b.kr/S2BNCustomer/Tpmu000.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tpmu000.do";    // 주문목록
+edu_shop_sub6="http://www.s2b.kr/S2BNCustomer/Tpmu100.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tpmu100.do";    // 검수목록
+edu_shop_sub7="http://www.s2b.kr/S2BNCustomer/Tpmu300.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tpmu300.do";    // 결제목록
+
+
+// 도서
+edu_book="http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/book_sub.jsp";
+edu_book_sub1="http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/book_sub.jsp";
+edu_book_sub2="http://www.s2b.kr/S2BNCustomer/Tkmu100.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tkmu100.do ";    // 검수목록
+edu_book_sub3="http://www.s2b.kr/S2BNCustomer/Tkmu300.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Tkmu300.do ";    // 결제목록
+
+
+// 의약품
+edu_medicine="http://www.s2b.kr/S2BNCustomer/Medic200.do?forwardName=new_default2=menu&fromFlag=medicalMain";   // 주문하기
+edu_medicine_sub1="http://www.s2b.kr/S2BNCustomer/Medic200.do?forwardName=new_default2&fromFlag=medicalMain";   // 주문하기
+edu_medicine_sub2="http://www.s2b.kr/S2BNCustomer/Tgmu130.do?forwardName=compare_list2&fromFlag=medicalMain";   // 비교담기
+edu_medicine_sub3="http://www.s2b.kr/S2BNCustomer/Tgmu130.do?forwardName=interest_list2&fromFlag=medicalMain";   // 관심물품
+edu_medicine_sub4="http://www.s2b.kr/S2BNCustomer/Medic400.do?forwardName=list_2&fromFlag=medicalMain";    // 장바구니
+edu_medicine_sub5="http://www.s2b.kr/S2BNCustomer/Tpmu000_medic.do?forwardName=list2&fromFlag=medicalMain";    // 주문목록
+edu_medicine_sub6="http://www.s2b.kr/S2BNCustomer/Tpmu100_medic.do?forwardName=list2&fromFlag=medicalMain";    // 검수목록
+edu_medicine_sub7="http://www.s2b.kr/S2BNCustomer/Tpmu300_medic.do?forwardName=list2&fromFlag=medicalMain";    // 결제목록
+
+// 이벤트몰
+edu_eventmall="javascript:goEventPage('eventMall')";
+
+
+// 고객센터
+edu_guide="javascript:selectBoard('1')";
+edu_guide_sub1="javascript:selectBoard('1')";
+edu_guide_sub2="javascript:selectBoard('5')";
+edu_guide_sub3="javascript:goBoardList('8')";
+edu_guide_sub4="javascript:goBoardList('g')";
+edu_guide_sub5="javascript:goBoardList('7')";
+edu_guide_sub6="javascript:selectBoard('f')";
+edu_guide_sub7="javascript:selectBoard('e')";
+edu_guide_sub8="javascript:selectBoard2('0')";
+edu_guide_sub9="javascript:goBoardList('i')";
+
+
+//렌탈몰
+edu_rental="http://www.s2b.kr/S2BNCustomer/Srma001.do?forwardName=list&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Srma001.do?forwardName=list";
+edu_rental_sub1 ="http://www.s2b.kr/S2BNCustomer/Srma001.do?forwardName=list&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Srma001.do?forwardName=list";
+edu_rental_sub2 ="http://www.s2b.kr/S2BNCustomer/Srmb001.do?forwardName=list&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Srmb001.do?forwardName=list";
+edu_rental_sub3 ="http://www.s2b.kr/S2BNCustomer/Srma001.do?forwardName=list3&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Srma001.do?forwardName=list3";
+
+
+// 동영상 도우미
+edu_movie="http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/b_flash.jsp";
+
+// 입찰
+edu_tender="http://www.s2b.kr/S2BNCustomer/stma001.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/stma001.do";
+tender_sub1="http://www.s2b.kr/S2BNCustomer/stma001.do?forwardName=register&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/stma001.do?forwardName=register";
+tender_sub2="http://www.s2b.kr/S2BNCustomer/stma001.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/stma001.do";
+tender_sub3="http://www.s2b.kr/S2BNCustomer/stmb001.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/stmb001.do";
+tender_sub4="http://www.s2b.kr/S2BNCustomer/stmb001.do?forwardName=list_d&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/stmb001.do?forwardName=list_d";
+tender_sub5="http://www.s2b.kr/S2BNCustomer/stmd001.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/stmd001.do";
+tender_sub7="http://www.s2b.kr/S2BNCustomer/stmg001.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/stmg001.do";
+tender_sub8="http://www.s2b.kr/S2BNCustomer/stmh001.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/stmh001.do";
+tender_sub9="http://www.s2b.kr/S2BNCustomer/stmz001.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/stmz001.do";
+tender_sub10="http://www.s2b.kr/S2BNCustomer/cfile001.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/cfile001.do";
+
+//기획전
+special_main ="http://www.s2b.kr/S2BNCustomer/Eventmall.do";
+special_p01="http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=cumputer_office&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=cumputer_office";
+special_p02 ="http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=field_day&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=field_day";
+special_p03="http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=beautify_cleanliness&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=beautify_cleanliness";
+special_p04="http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=teaPurchase&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=teaPurchase";
+
+
+
+//이벤트
+event_main = "http://www.s2b.kr/S2BNCustomer/customer600No.do?forwardName=eventSubMain&division=5";
+event_e01 = "http://www.s2b.kr/S2BNCustomer/S2B/scrweb/event/archi_event.jsp";
+event_e02 = "http://www.s2b.kr/S2BNCustomer/S2B/scrweb/event/20100319.jsp?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/S2B/scrweb/event/20100319.jsp";
+event_e03 = "http://www.s2b.kr/S2BNCustomer/S2B/scrweb/event/join_event.jsp?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/S2B/scrweb/event/join_event.jsp";
+//구매지원
+buy_support_sub1 = "http://www.s2b.kr/S2BNCustomer/S2B/scrweb/spmu/spma/spma000.jsp";
+buy_support_sub2 = "http://www.s2b.kr/S2BNCustomer/Spma001.do?forwardName=ins&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Spma001.do?forwardName=ins";
+buy_support_sub3 = "http://www.s2b.kr/S2BNCustomer/Spmb001.do?forwardName=list&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Spmb001.do?forwardName=list";
+
+//설계 용역
+
+edu_archi = "http://www.s2b.kr/S2BNCustomer/Spmb001.do?forwardName=spmb&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Spmb001.do?forwardName=spmb";
+edu_archi_sub1 = "http://www.s2b.kr/S2BNCustomer/Spmb001.do?forwardName=spmb&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Spmb001.do?forwardName=spmb";
+edu_archi_sub2 = "http://www.s2b.kr/S2BNCustomer/Spma001.do?forwardName=ins5&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Spma001.do?forwardName=ins5";
+edu_archi_sub3 = "http://www.s2b.kr/S2BNCustomer/Spmb001.do?forwardName=list2&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Spmb001.do?forwardName=list2";
+edu_archi_sub4 = "http://www.s2b.kr/S2BNCustomer/Spmb001.do?forwardName=list3&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Spmb001.do?forwardName=list3";
+edu_archi_sub5 = "http://www.s2b.kr/S2BNCustomer/Spmb001.do?forwardName=payList&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Spmb001.do?forwardName=payList";
+edu_archi_sub6 = "http://www.s2b.kr/S2BNCustomer/Spmb001.do?forwardName=list4&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Spmb001.do?forwardName=list4";
+
+
+//---------------new Top(정보처리장치 지정 관련)
+//My Desk
+sub0100 =	"http://www.s2b.kr/S2BNCustomer/Login.do";	 //구매현황
+sub0101 =	"http://www.s2b.kr/S2BNCustomer/Login.do";	 //구매현황
+sub0102 =   "http://www.s2b.kr/S2BNCustomer/Login.do";	//전자계약
+sub0103 =   "http://www.s2b.kr/S2BNCustomer/Login.do";	 //실적
+sub0104 =   "http://www.s2b.kr/S2BNCustomer/Login.do";	 //회원정보 
+sub0105 =	"http://www.s2b.kr/S2BNCustomer/Login.do";	 //개인회원관리
+sub0106 =	"http://www.s2b.kr/S2BNCustomer/Login.do";	//이용수수료 현황
+sub0107	=	"http://www.s2b.kr/S2BNCustomer/Login.do";	//업체현황
+sub0109	="http://www.s2b.kr/S2BNCustomer/Tmmu700.do";  // 에듀파인연계현황	
+
+//1인수의 즉시견적
+sub0200 =	"http://www.s2b.kr/S2BNCustomer/S2B/scrweb/remu/rema/searchengine/s2bCustomerSearch.jsp";	//1인수의 - 즉시견적(물품검색)
+sub0201 =	"http://www.s2b.kr/S2BNCustomer/S2B/scrweb/remu/rema/searchengine/s2bCustomerSearch.jsp";	//물품정보 검색
+sub0202 =	"http://www.s2b.kr/S2BNCustomer/remc100.do?forwardName=estimateList";	//선택물품함 목록
+sub0203 =	"http://www.s2b.kr/S2BNCustomer/remd100.do?forwardName=negoList";	//수의시담 목록
+sub0204 =	"http://www.s2b.kr/S2BNCustomer/reme100.do";	//계약상대자 결정
+sub0205 =	"http://www.s2b.kr/S2BNCustomer/remf100.do";	//검수목록
+sub0206 =	"http://www.s2b.kr/S2BNCustomer/remg200.do";	//결제목록
+sub0207 =	"http://www.s2b.kr/S2BNCustomer/remh100.do";	//변경계약목록
+
+//1인수의 견적서 제출
+sub0700 =	"http://www.s2b.kr/S2BNCustomer/tcmu100.do?forwardName=register1&fromFlag=G";	//1인수의 견적서 제출
+sub0701 =	"http://www.s2b.kr/S2BNCustomer/tcmu100.do?forwardName=register1&fromFlag=G";	//안내공고작성
+sub0702 =	"http://www.s2b.kr/S2BNCustomer/Tcmu200.do";	//안내공고/받은견적
+sub0703 =	"http://www.s2b.kr/S2BNCustomer/Tcmu300.do";	//계약상대자결정목록
+sub0704 =	"http://www.s2b.kr/S2BNCustomer/Tcmu500.do";	//검수목록
+sub0705 =	"http://www.s2b.kr/S2BNCustomer/Tcmu600.do";	//세금계산서/결제목록
+sub0706 =	"http://www.s2b.kr/S2BNCustomer/Tcmu700.do";	//변경계약목록
+
+//2인수의
+sub0800 =	"http://www.s2b.kr/S2BNCustomer/tcmu100.do?forwardName=register2&fromFlag=G";	//2인수의
+sub0801 =	"http://www.s2b.kr/S2BNCustomer/tcmu100.do?forwardName=register2&fromFlag=G";	//안내공고작성
+sub0802 =	"http://www.s2b.kr/S2BNCustomer/Tcmu200.do";	//안내공고/받은견적
+sub0803 =	"http://www.s2b.kr/S2BNCustomer/Tcmu300.do";	//계약상대자결정목록
+sub0804 =	"http://www.s2b.kr/S2BNCustomer/Tcmu500.do";	//검수목록
+sub0805 =	"http://www.s2b.kr/S2BNCustomer/Tcmu600.do";	//세금계산서/결제목록
+sub0806 =	"http://www.s2b.kr/S2BNCustomer/Tcmu700.do";	//변경계약목록
+
+//입찰
+sub0300 =   "http://www.s2b.kr/S2BNCustomer/stmb001.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/stmb001.do";	//공고
+sub0301 =	"http://www.s2b.kr/S2BNCustomer/stma001.do?forwardName=register&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/stma001.do?forwardName=register";	//공고문작성
+sub0302 =   "http://www.s2b.kr/S2BNCustomer/stmb001.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/stmb001.do";	//공고
+sub0303 =   "http://www.s2b.kr/S2BNCustomer/stmb001.do?forwardName=list_d&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/stmb001.do?forwardName=list_d";	//개찰
+sub0304 =   "http://www.s2b.kr/S2BNCustomer/stmg001.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/stmg001.do";	//검수
+sub0305 =	"http://www.s2b.kr/S2BNCustomer/stmh001.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/stmh001.do";	//결재
+sub0306 =	"http://www.s2b.kr/S2BNCustomer/stmz001.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/stmz001.do";	//완료
+sub0307 =	"http://www.s2b.kr/S2BNCustomer/cfile001.do?fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/cfile001.do";	//문서고
+
+//계약현황
+sub0400 =   "http://www.s2b.kr/S2BNCustomer/tcmo001.do?forwardName=list01";	
+sub0401 =	"http://www.s2b.kr/S2BNCustomer/tcmo001.do?forwardName=list01";	//수의계약내역
+sub0402 =   "http://www.s2b.kr/S2BNCustomer/stmo001.do";	//입찰계약내역
+
+//온라인고객지원
+sub0500 =	"http://www.s2b.kr/S2BNCustomer/customer600No.do?forwardName=board&division=1";	//공지사항
+sub0501 =	"http://www.s2b.kr/S2BNCustomer/customer600No.do?forwardName=board&division=1";	//공지사항
+sub0502 =   "http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/s2b_schedule.jsp";	//연수안내
+sub0503 =   "http://www.s2b.kr/S2BNCustomer/customer600.do?forwardName=board2&division=7";	//질문과답변
+sub0504 =   "http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/s2b_use_info01.jsp";	//이용안내
+sub0505 =	"http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/s2b_faq_school.jsp";	//FAQ
+sub0506 =	"http://www.s2b.kr/S2BNCustomer/customer600No.do?forwardName=board&division=e";	//자료실
+sub0507 =	"http://www.s2b.kr/S2BNCustomer/customer600No.do?forwardName=regist3&division=h";	//온라인상담실
+sub0508 =	"http://www.s2b.kr/S2BNCustomer/customer600.do?forwardName=board4&division=k";	//S2B에 제안
+
+
+
+//온라인고객지원
+sub0600 =	"http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/s2b_info01_intro.jsp";	//개요
+sub0601 =	"http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/s2b_info01_intro.jsp";	//개요
+sub0602 =   "http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/s2b_info06_partner.jsp";	//제휴관계
+sub0603 =	"http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/s2b_info03_history.jsp";	//연혁
+sub0604 =	"http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/s2b_info04_news.jsp";	//언론보도
+sub0605 =	"http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/s2b_info05_pr.jsp";	//홍보마당
+sub0606 =	"http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/s2b_info10_center.jsp";	//지역센터안내
+sub0607 =	"http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/s2b_info08_visit.jsp";	//찾아오시는길
+
+//------------------new Top(정보처리장치 지정 관련) 끝
+
+function link(name, win) {
+
+    if (eval(name) == "") {
+		alert("서비스 준비중입니다.");
+		return;
+	}else if(name=="edu_shop"
+		|| name=="edu_shop_sub1"
+			|| name=="edu_shop_sub2"
+			|| name=="edu_shop_sub3"
+			|| name=="edu_shop_sub4"
+			|| name=="edu_medicine"
+			|| name=="edu_medicine_sub1"
+			|| name=="edu_medicine_sub2"
+			|| name=="edu_medicine_sub3"
+			|| name=="edu_medicine_sub4"
+			|| name=="edu_rental"
+			|| name=="edu_rental_sub1"
+			|| name=="special_main"
+			|| name=="special_p01"
+			|| name=="special_p02"
+			|| name=="special_p03"
+			|| name=="special_p04"
+			|| name=="buy_support_sub2"
+			|| name=="edu_archi_sub2"
+				){
+
+			alert('현재 서비스는 사용할 수 없습니다. '); 
+			return;
+		}
+
+    
+	else if(name=="edu_insurance"){
+		var url = "http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/popup_insurance.html";
+		window.open(url, "popupBook", "width=410, height=310");
+	}else if(name=="edu_mydesk_sub8"){ // My Desk 이용안내 팝업
+		var url = "http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/info_pop_01.html";
+		window.open(url, "popupBook", "width=400, height=460");
+	}else if(name=="edu_estimate_sub6"){ // 견적구매 이용안내 팝업
+		var url = "http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/info_pop_02.html";
+		window.open(url, "popupBook", "width=400, height=425");
+	}else if(name=="edu_shop_sub6"){ // 바로구매 이용안내 팝업
+		var url = "http://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/info_pop_03.html";
+		window.open(url, "popupBook", "width=400, height=425");
+	}else {
+
+      if (win == null) {
+			    document.location.href = eval(name);
+	  } else {
+			    window.open(eval(name), win);
+	  }
+	}
+}
+
+	function selectBoard(num){
+		var form = document.customer600Form;
+		form.forwardName.value = 'board';
+		form.division.value = num;
+		actSubmit(form);
+	}
+
+	function selectBoard2(num){
+		var form = document.customer600Form;
+		form.forwardName.value = 'image';
+		form.division.value = num;
+		actSubmit(form);
+	}
+
+
+   	function go_G_event(fn){
+		window.location.href = "http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName="+fn;
+	}
+
+	function goBoardList(flag){
+		var form = document.LoginForm;
+		form.elements['fromFlag'].value = "boardList";
+		form.elements['division'].value = flag;
+		actSubmit(form);
+	}
+
+
+
+
+
+
+   function goEventPage(flag){
+
+      var form = document.LoginForm;
+      if(flag=="1"){
+         //상장봉투특가전
+		form.elements['fromFlag'].value = "event";
+		retrieveTax();
+
+      }else if(flag=="2"){
+         //레이져프린터사은행사, 잉크토너다이어트S/W행사
+
+		form.elements['fromFlag'].value = "event2";
+		retrieveTax();
+      }else if(flag=="3"){
+         //캠코더디카특가전
+
+		form.elements['fromFlag'].value = "event3";
+		retrieveTax();
+      }else if(flag=="4"){
+         //PAPS모음전
+
+		form.elements['fromFlag'].value = "event4";
+		retrieveTax();
+      }else if(flag=="5"){
+         //현미경&실험세트
+
+		form.elements['fromFlag'].value = "event5";
+		retrieveTax();
+      }else if(flag=="6"){
+         //무선앰프초특가,디지털도어락묶음할인전,타블렛1+1행사, 계양전동드릴특가행사
+
+		form.elements['fromFlag'].value = "event6";
+		retrieveTax();
+      }else if(flag=="0905c1_01"){
+         //건강분필특가전
+
+		form.elements['fromFlag'].value = "0905c1_01";
+		retrieveTax();
+      }else if(flag=="0905c3_01"){
+         //파나소닉다이또안마의자입점행사
+
+		form.elements['fromFlag'].value = "0905c3_01";
+		retrieveTax();
+      }else if(flag=="0905c5_01"){
+         //무선앰프추가(토크보이)
+
+		form.elements['fromFlag'].value = "0905c5_01";
+		retrieveTax();
+      }else if(flag=="0905c6_01"){
+         //와콤타블렛
+
+		form.elements['fromFlag'].value = "0905c6_01";
+		retrieveTax();
+      }else if(flag=="0905c7_01"){
+         //학교안전체육용품행사
+
+		form.elements['fromFlag'].value = "0905c7_01";
+		retrieveTax();
+      }else if(flag=="PaperEvent"){
+         //복사용지 이벤트
+
+		form.elements['fromFlag'].value = "PaperEvent";
+		retrieveTax();
+      }else if(flag=="200908_c1"){
+         //행정용품
+
+		form.elements['fromFlag'].value = "200908_c1";
+		retrieveTax();
+      }else if(flag=="EplayEvent"){
+         //영어나라
+
+		form.elements['fromFlag'].value = "EplayEvent";
+		retrieveTax();
+
+      }else if(flag=="200907_c1"){
+         //친환경
+
+		form.elements['fromFlag'].value = "200907_c1";
+		retrieveTax();
+      }else if(flag=="200908_c2"){
+         //스트레스
+
+		form.elements['fromFlag'].value = "200908_c2";
+		retrieveTax();
+      }else if(flag=="200907_c3"){
+         //신비한과학
+
+		form.elements['fromFlag'].value = "200907_c3";
+		retrieveTax();
+      }else if(flag=="200907_c4"){
+         //스탬프
+
+		form.elements['fromFlag'].value = "200907_c4";
+		retrieveTax();
+      }else if(flag=="eventMall"){ // 기획전
+    	  window.document.location.href = "http://www.s2b.kr/S2BNCustomer/Eventmall.do";
+      }else if(flag=="20100319_Tsaver"){ // T-Saver
+		 form.elements['fromFlag'].value = "20100319_Tsaver";
+         retrieveTax();
+       } else if(flag=="eventMain"){ // 이벤트 메인
+     	  window.document.location.href = "http://www.s2b.kr/S2BNCustomer/customer600No.do?forwardName=eventSubMain&division=5";
+       } else if(flag=="list37"){ //영상기기 기획전
+    	  window.document.location.href = "http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=list37&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=list37"
+       } else if(flag=="list33"){ //사무용품 기획전
+    	  window.document.location.href = "http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=list33&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=list33"
+       } else if(flag=="join_event"){
+    	  window.document.location.href = "http://www.s2b.kr/S2BNCustomer/S2B/scrweb/event/join_event.jsp";
+       } else if(flag=="list_computer"){
+    	  window.document.location.href = "http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=list_computer&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=list_computer";
+       } else if(flag=="list25"){
+    	  window.document.location.href = "http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=list25&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=list25";
+       }else if(flag=="list_study"){
+     	  window.document.location.href = "http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=list_study&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=list_study";
+       }else if(flag=="list_legal"){
+     	  window.document.location.href = "http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=list_legal&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=list_legal";
+       }else if(flag=="archi_event"){
+     	  window.document.location.href = "http://www.s2b.kr/S2BNCustomer/S2B/scrweb/event/archi_event.jsp";
+       }else if(flag=="list_preschool"){
+     	  window.document.location.href = "http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=list_preschool&fromFlag=menu&toUrl=http://www.s2b.kr/S2BNCustomer/Gevent001.do?forwardName=list_preschool";
+       }
+   }
+
+	function retrieveTax()
+	  {
+		var form = document.LoginForm;
+		actSubmit(form);
+	  }
+
+
+
+
+</script>
+
+<form name="customer600Form" method="post" action="/S2BNCustomer/customer600No.do">
+  <input type="hidden" name="pageNo" value="1">
+  <input type="hidden" name="orderBy" value="">
+  <input type="hidden" name="forwardName" value="default">
+  <input type="hidden" name="customer600VO.manageCode" value="">
+  <input type="hidden" name="division" value="">
+  <input type="hidden" name="writer" value="">
+  <input type="hidden" name="seachDivision" value="">
+  <input type="hidden" name="seachData" value="">
+  <input type="hidden" name="searchDataCategory" value="">
+  <input type="hidden" name="euss_division" value="">
+</form>
+
+	<form name="m_leftForm" method="post" action="/S2BNCustomer/m_left.do">
+	<input type="hidden" name="pageNo" value="1">
+	<input type="hidden" name="orderBy" value="">
+	<input type="hidden" name="forwardName" value="default">
+	<tr>
+		<td>
+			
+
+
+
+
+
+
+
+<link type="text/css" rel="stylesheet" href="/S2BNCustomer/S2B/scrweb/css/s2b_main.css"/>
+
+<script type="text/javascript"> 
+
+	function activeMenu() {
+		$('#navi1, #navi2, #navi3, #navi4, #navi5, #navi6, #navi7').hide();
+	}
+
+	$(function() {
+
+		getGosiData(); //행정안전부 고시 ajax
+		
+		activeMenu();
+	
+		// gnb1
+		$('table.gnbTable img').mouseover(function(){
+	
+			$('#navi1, #navi2, #navi3, #navi4, #navi5, #navi6, #navi7').hide();
+	
+			var idx = $('table.gnbTable img').index(this);
+	
+			$('#navi'+parseInt(idx+1)).show();
+	
+			if($(this).attr('src').indexOf('_on') < 0){
+	    		$(this).attr('src', $(this).attr('src').replace('.gif', '_on.gif'));
+	    	}
+	
+			for(var k=1; k<6; k++){
+			    if ( k != parseInt(idx+1) && $('#menu'+k).attr('src').indexOf('_on') > 0 ){
+			        $('#menu'+k).attr('src', $('#menu'+k).attr('src').replace('_on.gif', '.gif'));
+			    }
+			}
+		});
+	 
+	    // gnb2
+		$('#navi1 img').mouseover(function(){
+			$(this).attr('src', $(this).attr('src').replace('.gif', '_on.gif'));
+		}).mouseleave(function() {
+			$(this).attr('src', $(this).attr('src').replace('_on.gif', '.gif'));
+		});
+	
+		$('#navi2 img').mouseover(function(){
+			$(this).attr('src', $(this).attr('src').replace('.gif', '_on.gif'));
+		}).mouseleave(function() {
+			$(this).attr('src', $(this).attr('src').replace('_on.gif', '.gif'));
+		});
+	
+		$('#navi3 img').mouseover(function(){
+			$(this).attr('src', $(this).attr('src').replace('.gif', '_on.gif'));
+		}).mouseleave(function() {
+			$(this).attr('src', $(this).attr('src').replace('_on.gif', '.gif'));
+		});
+	
+		$('#navi4 img').mouseover(function(){
+			$(this).attr('src', $(this).attr('src').replace('.gif', '_on.gif'));
+		}).mouseleave(function() {
+			$(this).attr('src', $(this).attr('src').replace('_on.gif', '.gif'));
+		});
+	
+		$('#navi5 img').mouseover(function(){
+			$(this).attr('src', $(this).attr('src').replace('.gif', '_on.gif'));
+		}).mouseleave(function() {
+			$(this).attr('src', $(this).attr('src').replace('_on.gif', '.gif'));
+		});
+	
+		$('#navi6 img').mouseover(function(){
+			$(this).attr('src', $(this).attr('src').replace('.gif', '_on.gif'));
+		}).mouseleave(function() {
+			$(this).attr('src', $(this).attr('src').replace('_on.gif', '.gif'));
+		});
+	
+		$('#navi7 img').mouseover(function(){
+			$(this).attr('src', $(this).attr('src').replace('.gif', '_on.gif'));
+		}).mouseleave(function() {
+			$(this).attr('src', $(this).attr('src').replace('_on.gif', '.gif'));
+		});
+	
+		$('#navi1, #navi2, #navi3, #navi4, #navi5, #navi6, #navi7').mouseleave(function(){
+			activeMenu();
+		});
+	
+		$('#main_content').mouseenter(function(){
+		    for(var k=1; k<6; k++){
+		        if ($('#menu'+k).attr('src').indexOf('_on') > 0){
+			        $('#menu'+k).attr('src', $('#menu'+k).attr('src').replace('_on.gif', '.gif'));
+			    }
+			}
+			activeMenu();
+		});
+	});
+	
+	// top menu 링크 이동
+	function fncGoMenu(section){
+		
+		if(section == 'tgruMain'){
+        	 window.location = '/S2BNCustomer/EstimateInfoMain.do';
+        }else if(section == 'tgru'){	// 1인수의 즉시견적
+			window.location = '/S2BNCustomer/S2B/scrweb/remu/rema/searchengine/s2bCustomerSearch.jsp?loggerCP=/즉시견적/물품정보 검색&search=1';
+		} else if(section == 'tgru1'){
+			window.location = '/S2BNCustomer/remc100.do?forwardName=estimateList&loggerCP=/즉시견적/선택물품함 목록';
+		} else if(section == 'tgru2'){
+			window.location = '/S2BNCustomer/remd100.do?forwardName=negoList&loggerCP=/즉시견적/수의시담 목록';
+		} else if(section == 'tgru3'){
+			window.location = '/S2BNCustomer/reme100.do?loggerCP=/즉시견적/계약상대자 결정';
+        } else if(section == 'tgru8'){
+            window.location = '/S2BNCustomer/reme100.do?forwardName=list_cancel&loggerCP=/즉시견적/계약상대자 결정 취소 목록';
+        } else if(section == 'tgru7'){
+            window.location = '/S2BNCustomer/remi100.do?loggerCP=/즉시견적/계약 목록';
+		} else if(section == 'tgru4'){
+			window.location = '/S2BNCustomer/remf100.do?loggerCP=/즉시견적/검수 목록';
+		} else if(section == 'tgru5'){
+			window.location = '/S2BNCustomer/remg200.do?loggerCP=/즉시견적/결제 목록';
+		} else if(section == 'tgru6'){
+			window.location = '/S2BNCustomer/remh100.do';	// 즉시견적 변경계약 목록
+			
+		} else if(section == 'tgru07'){
+			window.location = '/S2BNCustomer/S2B/scrweb/remu/rema/searchengine/s2bCustomerSearch.jsp?setLocal=all&actionType=ONLY_CATEGORY&CERT_CODE_YN=Y&publicPurchaseCode=0&loggerCP=/즉시견적/물품정보 검색';	// 즉시견적 공공물품 검색
+		} else if(section == 'tgru08'){
+			window.location = '/S2BNCustomer/S2B/scrweb/remu/rema/searchengine/s2bCustomerSearch.jsp?loggerCP=/즉시견적/중기간경쟁제품 검색&actionType=ONLY_CATEGORY&searchField=ALL&categoryLevel1Code=142000000000';	// 즉시견적 중기간경쟁제품 검색
+			
+        } else if(section == 'tgru09'){
+			window.location = '/S2BNCustomer/S2B/scrweb/remu/rema/searchengine/s2bCustomerSearch.jsp?setLocal=all&loggerCP=/즉시견적/어린이제품kc인증&actionType=ONLY_CATEGORY&CERT_CODE_119=Y&kcMall=Y';	// 즉시견적 중기간경쟁제품 검색
+			
+        } else if(section == 'tgru8'){
+            window.location = '/S2BNCustomer/reme100.do?forwardName=list_cancel&loggerCP=/즉시견적/계약상대자 결정 취소 목록';
+        } else if(section == 'tgru7'){
+            window.location = '/S2BNCustomer/remi100.do?loggerCP=/즉시견적/계약 목록';
+            
+            
+		} else if(section == 'tomu1'){	// 1인수의 수의계약
+			window.location = 'https://www.s2b.kr/S2BNCustomer/tcmu100.do?forwardName=register1&fromFlag=G&loggerCP=/수의계약/안내공고 작성';
+		} else if(section == 'tomu1_1'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/Tcmu200.do?forwardName=tempSaveList&loggerCP=/수의계약/안내공고 임시저장 목록';
+		} else if(section == 'tomu1_2'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/Tcmu200.do?selPrivateContract=1&loggerCP=/수의계약/안내공고_받은견적';
+		} else if(section == 'tomu1_3'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/Tcmu300.do?loggerCP=/수의계약/계약상대자결정 목록';
+		} else if(section == 'tomu1_4'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/Tcmu500.do?loggerCP=/수의계약/검수목록';
+		} else if(section == 'tomu1_5'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/Tcmu600.do?loggerCP=/수의계약/세금계산서_결제목록';
+		} else if(section == 'tomu1_6'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/Tcmu700.do';	// 1인수의 변경계약 목록
+		} else if(section == 'tomu1_7'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/Tcmu200.do?forwardName=editList&loggerCP=/수의계약/수의시담 목록';
+		}  else if(section == 'tomu1_8'){   
+			window.location = 'https://www.s2b.kr/S2BNCustomer/Tcmu300.do?forwardName=listNew&loggerCP=/수의계약/계약목록';	
+		}  else if(section == 'tomu2'){	// 2인수의 수의계약
+			window.location = 'https://www.s2b.kr/S2BNCustomer/tcmu100.do?forwardName=register2&fromFlag=G&loggerCP=/수의계약/안내공고 작성';
+		} else if(section == 'tomu2_1'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/Tcmu200.do?forwardName=tempSaveList&loggerCP=/수의계약/안내공고 임시저장 목록';
+		} else if(section == 'tomu2_2'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/Tcmu200.do?selPrivateContract=2&loggerCP=/수의계약/안내공고_받은견적';
+		} else if(section == 'tomu2_3'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/Tcmu300.do?loggerCP=/수의계약/계약상대자결정 목록';
+		} else if(section == 'tomu2_4'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/Tcmu500.do?loggerCP=/수의계약/검수목록';
+		} else if(section == 'tomu2_5'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/Tcmu600.do?loggerCP=/수의계약/세금계산서_결제목록';
+		} else if(section == 'tomu2_6'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/Tcmu700.do';	// 2인수의 변경계약 목록
+		} else if(section == 'tomu2_7'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/Tcmu300.do?forwardName=listNew&loggerCP=/수의계약/계약목록';	
+		} else if(section == 'ttmu'){	// 입찰
+			window.location = 'https://www.s2b.kr/S2BNCustomer/stmb001.do?loggerCP=/입찰/입찰공고문 목록';
+		} else if(section == 'ttmu1'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/stma001.do?forwardName=register_s&loggerCP=/입찰/입찰공고문 작성';
+		} else if(section == 'ttmu2'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/stmb001.do?forwardName=list_d&loggerCP=/입찰/개찰대상 목록';
+		} else if(section == 'ttmu3'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/stmg001.do?loggerCP=/입찰/검수 목록';
+		} else if(section == 'ttmu4'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/stmh001.do?loggerCP=/입찰/결제 목록';
+		} else if(section == 'ttmu5'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/stmz001.do?loggerCP=/입찰/완료 목록';
+		} else if(section == 'ttmu6'){
+			window.location = 'https://www.s2b.kr/S2BNCustomer/cfile001.do?loggerCP=/입찰/문서고 관리';
+		} else if(section == 'tmmu'){	// 계약현황 / 수의계약 계약현황
+			window.location = '/S2BNCustomer/tcmo001.do?forwardName=list01';
+		} else if(section == 'tmmu2'){	// 입찰 계약현황
+			window.location = '/S2BNCustomer/stmo001.do';
+			
+		} else if(section == 'tcmp1'){	// 발주
+			window.location = '/S2BNCustomer/tcmp100.do';
+            
+        } else if(section == 'tcmp3'){  // 사전규격
+            window.location = '/S2BNCustomer/tcmp300.do';	
+		
+		} else if(section == 'login'){	//계약법령 준수를 위한 시스템 개선 CNI002
+			window.location = '/S2BNCustomer/Login.do';
+		} else if(section == 'tcmp4'){
+			window.location = '/S2BNCustomer/tcmp100.do?forwardName=failDeliveryList';
+		}
+		
+	}
+	
+	//행정안전부 고시 ajax
+	function getGosiData(){
+		 ajaxGosiData();
+	}
+	function ajaxGosiData(){    
+	    $.ajax({
+	    	url		: '/S2BNCustomer/Tcmu100NoSession.do',
+	    	data	: {forwardName : 'ajaxGosiData'},
+	    	type	: 'POST',
+	    	async	: false,
+	    	success:function(data){
+	    		data = data.replace(/\r/gi, "");
+	            data = data.replace(/\n/gi, "");
+	            if(data.indexOf("DOCTYPE HTML PUBLIC") > 0 ) {
+	            	$("#gosiTitle").text("행정안전부 고시 제2023-16호");
+	            } else {
+	            	$("#gosiTitle").text(data);
+	            }
+			}
+	    });
+	}
+
+
+</script>
+
+<form method="post" name="s2bSeoulFrm" action="/index.jsp">
+	<input type="hidden" name="loginYn" id="loginYn" value="N"/>	
+</form>
+<table width="980" style="margin-top:10px;" border="0">
+	
+	<tr>
+		<td align="left" width="430" valign="top">
+			<dt id="gosiTitle" style="font-size: 10.5px;font-weight: bold;color: #828282;"></dt><!-- 고시번호 영역 Ajax -->
+		</td>
+		<td align="center" width="120" valign="top"><a href="https://www.s2b.kr/S2BNCustomer/S2B/index.jsp"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/logo_s2b.gif"/></a></td>
+		<td align="right" width="430" valign="top">
+			
+				
+				
+					<div style="float:right"><a href="/S2BNCustomer/customer600No.do?forwardName=board&division=1"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/bt_top03.gif"/></a></div><!-- 고객지원 -->
+					<div style="float:right; margin-left:10px; margin-right:10px;"><a href="/S2BNCustomer/S2B/siteMap.jsp"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/bt_top02.gif"/></a></div><!-- 사이트맵 -->
+					<div style="float:right"><a href="/S2BNCustomer/Tmmu200.do?forwardName=newList"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/bt_top01.gif"/></a></div><!-- 마이데스크 -->
+					<div style="float:right; margin-left:10px;  margin-right:10px;"><a href="/S2BNCustomer/remc100.do?forwardName=estimateList&loggerCP=/즉시견적/선택물품함 목록"><img src="/S2BNCustomer/S2B/scrweb/images/main2025/bt_top04.gif"/></a></div><!-- 진행중계약에서  견적서접수목록 -->
+					<div style="float:right; margin-right:10px;"><a href="/S2BNCustomer/Login.do"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/bt_top_login.gif" /></a></div><!-- 로그인 -->		
+				
+			
+		</td>
+	</tr>
+	
+   	<tr><td colspan="3" height="15"></td></tr>
+   	<tr align="center">
+   		<td colspan="3">
+       		<table class="gnbTable">
+          			<tr>
+	            	<td style="background:URL(/S2BNCustomer/S2B/scrweb/images/main2012/gnb980_start.gif)" width="102" ></td>
+	            	<td><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu1.gif" id="menu1" style="cursor:pointer;" onclick="fncGoMenu('tgruMain')"></td>
+	            	<td><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu2.gif" id="menu2" style="cursor:pointer;" onclick="fncGoMenu('tomu1')"/></td>
+	            	<td><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu3.gif" id="menu3" style="cursor:pointer;" onclick="fncGoMenu('tomu2')"/></td>
+	            	<td><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu4.gif" id="menu4" style="cursor:pointer;" onclick="fncGoMenu('ttmu')"/></td>
+	            	<td><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu5.gif" id="menu5" style="cursor:pointer;" onclick="fncGoMenu('tmmu')"/></td>
+	            	<td style="background:URL(/S2BNCustomer/S2B/scrweb/images/main2012/gnb980_end.gif)" width="119" ></td>
+	            </tr>
+           	</table>
+			<div style="float:left; background:URL(/S2BNCustomer/S2B/scrweb/images/main2012/gnb_980bg.gif) no-repeat; width:980px; height:40px;">
+				<div style="position:relative; width:0px; height:0px; z-index:999999999999999; margin:0 auto;">
+	            	<div id="navi1" style="display:none; height:40px; z-index:999999999999999; margin-top:5px; margin-left:-457px; position:absolute;">
+		        		<table style="margin-top:-6px;" height="40">
+			          		<tr>
+			          			<td width="43"></td>
+					            
+					            <!-- 계약법령 준수를 위한 시스템 개선 CNI002 [Start] -->
+					            
+					            <td style="padding-left:0px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu11.gif" id="s_menu11" style="cursor:pointer" onclick="fncGoMenu('tgruMain')"></td>
+					            
+					            <!-- [29] 2014.11.05 위치별 메뉴명 통일 cheon [Start] -->
+								<td style="padding-left:10px"><img src="/S2BNCustomer/S2B/scrweb/images/main2020/top_menu001.gif" id="s_menu19" style="cursor:pointer" onclick="fncGoMenu('tgru09')"></td>            
+					            <td style="padding-left:10px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu018.gif" id="s_menu18" style="cursor:pointer" onclick="fncGoMenu('tgru07')"></td>
+					            
+					            <!-- [29] 2014.11.05 위치별 메뉴명 통일 cheon [End] -->
+					            
+					            <!-- 계약법령 준수를 위한 시스템 개선 CNI002 [End] -->
+					            
+					            <td style="padding-left:10px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu12.gif" id="s_menu12" style="cursor:pointer" onclick="fncGoMenu('tgru1')"></td>
+					            <td style="padding-left:10px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu13.gif" id="s_menu13" style="cursor:pointer" onclick="fncGoMenu('tgru2')"></td>
+					            <td style="padding-left:10px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu24.gif" id="s_menu14" style="cursor:pointer" onclick="fncGoMenu('tgru3')"></td>
+					            
+                                <td style="padding-left:10px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu19.gif" id="s_menu19" style="cursor:pointer" onclick="fncGoMenu('tgru8')"></td>
+                                <td style="padding-left:10px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu18.gif" id="s_menu18" style="cursor:pointer" onclick="fncGoMenu('tgru7')"></td>					            
+					            
+					            <td style="padding-left:10px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu15.gif" id="s_menu15" style="cursor:pointer" onclick="fncGoMenu('tgru4')"></td>
+					            <td style="padding-left:10px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu16.gif" id="s_menu16" style="cursor:pointer" onclick="fncGoMenu('tgru5')"></td>
+			                    <td style="padding-left:10px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu27.gif" id="s_menu17" style="cursor:pointer" onclick="fncGoMenu('tgru6')"></td>
+					            <td width="43"></td>
+					        </tr>
+		        		</table>
+	        		</div>
+            	</div>
+	            <div style="position:relative; width:0px; height:0px; z-index:999999999999999; margin:0 auto;">
+		            <div id="navi2" style="display:none; height:40px; z-index:999999999999999; margin-top:5px; margin-left:-380px; position:absolute;">
+		        		<table style="margin-top:-6px;" height="40">
+			          		<tr>
+			          			<td width="43"></td>
+					            <td style="padding-left:0px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu53.gif" id="s_menu21" style="cursor:pointer" onclick="fncGoMenu('tomu1')"></td>
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu56.gif" id="s_menu22" style="cursor:pointer" onclick="fncGoMenu('tomu1_1')"></td>
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu57.gif" id="s_menu23" style="cursor:pointer" onclick="fncGoMenu('tomu1_2')"></td>
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu28.gif" id="s_menu28" style="cursor:pointer" onclick="fncGoMenu('tomu1_7')"></td>
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu24.gif" id="s_menu24" style="cursor:pointer" onclick="fncGoMenu('tomu1_3')"></td>
+					            
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu18.gif" id="s_menu34" style="cursor:pointer" onclick="fncGoMenu('tomu1_8')"></td>
+					            
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu25.gif" id="s_menu25" style="cursor:pointer" onclick="fncGoMenu('tomu1_4')"></td>
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu26.gif" id="s_menu26" style="cursor:pointer" onclick="fncGoMenu('tomu1_5')"></td>
+			                    <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu27.gif" id="s_menu27" style="cursor:pointer" onclick="fncGoMenu('tomu1_6')"></td>
+					            <td width="43"></td>
+					        </tr>
+			        	</table>
+	        		</div>
+            	</div>
+	            <div style="position:relative; width:0px; height:0px; z-index:999999999999999; margin:0 auto;">
+		            <div id="navi3" style="display:none; height:40px; z-index:999999999999999; margin-top:5px; margin-left:-330px; position:absolute;">
+			        	<table style="margin-top:-6px;" height="40">
+			          		<tr>
+			          			<td width="43"></td>
+					            <td style="padding-left:0px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu21.gif" id="s_menu31" style="cursor:pointer" onclick="fncGoMenu('tomu2')"></td>
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu56.gif" id="s_menu32" style="cursor:pointer" onclick="fncGoMenu('tomu2_1')"></td>
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu23.gif" id="s_menu33" style="cursor:pointer" onclick="fncGoMenu('tomu2_2')"></td>
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu24.gif" id="s_menu34" style="cursor:pointer" onclick="fncGoMenu('tomu2_3')"></td>
+					            
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu18.gif" id="s_menu34" style="cursor:pointer" onclick="fncGoMenu('tomu2_7')"></td>
+					            
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu25.gif" id="s_menu35" style="cursor:pointer" onclick="fncGoMenu('tomu2_4')"></td>
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu26.gif" id="s_menu36" style="cursor:pointer" onclick="fncGoMenu('tomu2_5')"></td>
+			                    <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu27.gif" id="s_menu37" style="cursor:pointer" onclick="fncGoMenu('tomu2_6')"></td>
+					            <td width="43"></td>
+					        </tr>
+			        	</table>
+		        	</div>
+	            </div>
+	            <div style="position:relative; width:0px; height:0px; z-index:999999999999999; margin:0 auto;">
+		            <div id="navi4" style="display:none; height:40px; z-index:999999999999999; margin-top:5px; margin-left:-30px; position:absolute;">
+			        	<table style="margin-top:-6px;" height="40">
+			          		<tr>
+			          			<td width="43"></td>
+					            <td style="padding-left:0px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu41.gif" id="s_menu41" style="cursor:pointer" onclick="fncGoMenu('ttmu1')"></td>
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu42.gif" id="s_menu42" style="cursor:pointer" onclick="fncGoMenu('ttmu')"></td>
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu43.gif" id="s_menu43" style="cursor:pointer" onclick="fncGoMenu('ttmu2')"></td>
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu44.gif" id="s_menu44" style="cursor:pointer" onclick="fncGoMenu('ttmu3')"></td>
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu45.gif" id="s_menu45" style="cursor:pointer" onclick="fncGoMenu('ttmu4')"></td>
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu46.gif" id="s_menu46" style="cursor:pointer" onclick="fncGoMenu('ttmu5')"></td>
+			                    <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu47.gif" id="s_menu47" style="cursor:pointer" onclick="fncGoMenu('ttmu6')"></td>
+					            <td width="43"></td>
+					        </tr>
+			        	</table>
+		        	</div>
+	            </div>
+	            <div style="position:relative; width:0px; height:0px; z-index:999999999999999; margin:0 auto;">
+		            <div id="navi5" style="display:none; height:40px; z-index:999999999999999; margin-top:5px; margin-left:160px; position:absolute;">
+			        	<table style="margin-top:-6px;" height="40">
+			          		<tr>
+			          			<td width="43"></td>
+			          			<td style="padding-left:0px"><img src="/S2BNCustomer/S2B/scrweb/images/tcmp/top_menu_0423.gif" id="s_menu51" style="cursor:pointer" onclick="fncGoMenu('tcmp1')"></td>
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu58.gif" id="s_menu51" style="cursor:pointer" onclick="fncGoMenu('tcmp3')"></td>
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu59.gif" id="s_menu53" style="cursor:pointer" onclick="fncGoMenu('tcmp4')"></td>
+                                <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu51.gif" id="s_menu51" style="cursor:pointer" onclick="fncGoMenu('tmmu')"></td>
+					            <td style="padding-left:20px"><img src="/S2BNCustomer/S2B/scrweb/images/main2012/top_menu52.gif" id="s_menu52" style="cursor:pointer" onclick="fncGoMenu('tmmu2')"></td>
+					            <td width="43"></td>
+					        </tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</td>
+	</tr>
+</table>	<!-- TOP MENU -->    
+		</td>
+	</tr>
+	</form>
+</table>
+
+<!--topmenu end--></td>
+								</tr>
+								
+								<form name="tcmo001Form" method="post" action="/S2BNCustomer/tcmo001.do">
+									<input type="hidden" name="forwardName" value="list01">
+									<input type="hidden" name="pageNo" value="1">
+									<input type="hidden" name="estimateCode" value="">
+									<input type="hidden" name="tender_step_code" value="">
+									<input type="hidden" name="page_flag" value="">
+									<input type="hidden" name="process_yn" value="N" />
+									<input type="hidden" name="search_yn" value="N" />
+           						<tr>
+              						<td>
+              							<table width="980" border="0" cellspacing="0" cellpadding="0">
+							                <tr>
+							                  	<td colspan="3" class="td_pd">&nbsp;</td>
+							                </tr>
+							                <tr>
+                  								<td width="180" valign="top">
+                  									<table width="180" border="0" cellspacing="0" cellpadding="0">
+								                    	<tr>
+								                      		<td><!--leftmenu start-->
+
+
+
+
+
+
+
+
+
+
+
+<meta charset="euc-kr">
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+<script language="javascript">
+	//공지사항 상세보기
+	function boardRead3(mCode){
+    	window.location = 'https://www.s2b.kr/S2BNCustomer/customer600No.do?forwardName=read&division=1&customer600VO.manageCode='+mCode;  
+	}
+
+	function openLeftPop(){
+		window.open('https://www.thekmall.co.kr/eventExhibition/5969',"_blank","");
+	}
+</script>
+</head>
+<body>
+    <table width="180" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <td colspan="3"><img src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_title.gif" width="180" height="47" border="0" /></td>
+        </tr>
+        <tr>
+            <td width="2" bgcolor="#6395D0"></td>
+            <td width="176" align="center">
+                <table width="162" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td>
+                            <table width="162" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td>
+                                        <a href="https://www.s2b.kr/S2BNCustomer/tcmp100.do">
+                                            <img src="/S2BNCustomer/S2B/scrweb/images/tcmp/left_cont_m201404.gif" width="162" height="21" border="0" style="cursor:hand; vertical-align:middle;" align="absmiddle"/>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr><td height="1" bgcolor="#E1E1E1"></td></tr>
+                    <tr>
+                        <td>
+                            <table width="162" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td>
+                                        <a href="https://www.s2b.kr/S2BNCustomer/tcmp300.do">
+                                            <img src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_m4.gif" width="162" height="21" border="0" style="cursor:hand; vertical-align:middle;" align="absmiddle"/>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr><td height="1" bgcolor="#E1E1E1"></td></tr>
+                    
+                    <tr>
+                        <td>
+                            <table width="162" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td>
+                                        <a href="https://www.s2b.kr/S2BNCustomer/tcmp100.do?forwardName=failDeliveryList">
+                                            <img src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_m5.gif" border="0" style="cursor:hand; vertical-align:middle;" align="absmiddle"/>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr><td height="1" bgcolor="#E1E1E1"></td></tr>
+                    
+                    <tr>
+                        <td>
+                            <table width="162" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td><img src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_m1.gif" width="162" height="21" border="0" /></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://www.s2b.kr/S2BNCustomer/tcmo001.do?forwardName=list01">
+                                            <img src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s9_off.gif" width="162" height="19" border="0" onmouseover='this.src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s9_on.gif"' onmouseout='this.src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s9_off.gif"' />
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://www.s2b.kr/S2BNCustomer/tcmo001.do?forwardName=list02">
+                                            <img src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s2_off.gif" width="162" height="19" border="0" onmouseover='this.src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s2_on.gif"' onmouseout='this.src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s2_off.gif"' />
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://www.s2b.kr/S2BNCustomer/tcmo001.do?forwardName=list03">
+                                            <img src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s3_off.gif" width="162" height="19" border="0" onmouseover='this.src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s3_on.gif"' onmouseout='this.src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s3_off.gif"' />
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr><td height="1" bgcolor="#E1E1E1"></td></tr>
+                    <tr>
+                        <td>
+                            <table width="162" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td><img src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_m2.gif" width="162" height="21" border="0" /></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://www.s2b.kr/S2BNCustomer/stmo001.do">
+                                            <img src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s1_off.gif" width="162" height="19" border="0" onmouseover='this.src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s1_on.gif"' onmouseout='this.src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s1_off.gif"' />
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://www.s2b.kr/S2BNCustomer/stmo001.do?forwardName=list02">
+                                            <img src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s4_off.gif" width="162" height="19" border="0" onmouseover='this.src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s4_on.gif"' onmouseout='this.src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s4_off.gif"' />
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://www.s2b.kr/S2BNCustomer/stmo001.do?forwardName=list03">
+                                            <img src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s5_off.gif" width="162" height="19" border="0" onmouseover='this.src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s5_on.gif"' onmouseout='this.src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s5_off.gif"' />
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="https://www.s2b.kr/S2BNCustomer/stmo001.do?forwardName=list04">
+                                            <img src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s3_off.gif" width="162" height="19" border="0" onmouseover='this.src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s3_on.gif"' onmouseout='this.src="/S2BNCustomer/S2B/scrweb/images/condition/left_cont_s3_off.gif"' />
+                                        </a>
+                                    </td>
+                                </tr>
+                                
+                            </table>
+                        </td>
+                    </tr>
+                    <tr><td height="1" bgcolor="#E1E1E1"></td></tr>
+                    <tr><td height="15"></td></tr>
+                </table>
+            </td>
+            <td width="2" bgcolor="#6395D0"></td>
+        </tr>
+        <tr>
+            <td colspan="3"><img src="/S2BNCustomer/S2B/scrweb/images/condition/left_bottom.gif" width="180" height="5" border="0" style="vertical-align: top;" /></td>
+        </tr>
+        <tr><td colspan="3" height="5"></td></tr>
+  	
+  	<!-- 서울 소상공인 경우 기획전 인기검색어 삭제 -->
+	
+  	<!-- 공공구매물품 -->
+    <tr>
+        <td colspan="3"><img src="/S2BNCustomer/S2B/scrweb/images/main2016/s_banner_submall.jpg" width="180" height="154" usemap="#cs_special" border="0"/></td>
+    </tr>
+    <tr><td colspan="3" height="10"></td></tr>
+   
+	<!--사전가입 이벤트  -->
+	<tr>
+        <td colspan="3"><a href="/S2BNCustomer/S2B/scrweb/remu/rema/searchengine/surveyEvent.jsp"><img src="/S2BNCustomer/S2B/scrweb/images/event/signup/lnb_banner.png" width="180" height="100" border="0"></a></td>
+    </tr>
+    <tr><td colspan="3" height="10"></td></tr>
+	<!--e-biz팀 휴스테이  -->
+	<tr>
+        <td colspan="3"><a href="https://resort.teachiworld.com/s2/lifeculture/etc/ev2026_thekmall_stay.jsp"><img src="/S2BNCustomer/S2B/scrweb/images/main2020/s_banner_thekmall_stay.png" width="180" height="100" border="0"></a></td>
+    </tr>
+    <tr><td colspan="3" height="10"></td></tr>
+	
+	 <!-- KC인증 안전제품 기획전 -->
+    <tr>
+        <td colspan="3"><a href="/S2BNCustomer/S2B/scrweb/remu/rema/searchengine/kcSafetyProduct.jsp"><img src="/S2BNCustomer/S2B/scrweb/images/event/kcSafetyProduct/s_banner_kcSafetyProduct.png" width="180" height="100" border="0"></a></td>
+    </tr>
+    <tr><td colspan="3" height="10"></td></tr>
+
+	<!-- 에듀테크모음전 -->
+    <tr>
+        <td colspan="3"><a href="/S2BNCustomer/S2B/scrweb/remu/rema/searchengine/eduTechCollection.jsp"><img src="/S2BNCustomer/S2B/scrweb/images/event/eduTechCollection/s_banner_eduTech.jpg" width="180" height="100" border="0"></a></td>
+    </tr>
+    <tr><td colspan="3" height="10"></td></tr>
+   
+	
+
+    <!-- 원가협회안내 -->
+    <tr>
+        <td colspan="3"><a href="/S2BNCustomer/S2B/scrweb/remu/rema/searchengine/cmmTemplete.jsp"><img src="/S2BNCustomer/S2B/scrweb/images/event/cmmTemplete/s_banner.jpg" width="180" height="100" border="0"></a></td>
+    </tr>
+    <tr><td colspan="3" height="10"></td></tr>
+    <!-- 기획전 모음 -->
+    <tr>
+        <td colspan="3"><a href="/S2BNCustomer/S2B/scrweb/remu/rema/searchengine/eventcollection.jsp"><img src="/S2BNCustomer/S2B/scrweb/images/main2016/s_banner_collect.jpg" width="180" height="100" border="0"></a></td>
+    </tr>
+    <tr><td colspan="3" height="10"></td></tr>
+
+    
+    </table>
+<map name="cs_special" id="cs_special">        
+  <area shape="rect" coords="-1,-4,180,52"   alt="공공구매우선구매몰" href="/S2BNCustomer/S2B/scrweb/remu/rema/searchengine/s2bCustomerSearch.jsp?actionType=ONLY_CATEGORY&CERT_CODE_YN=Y&publicPurchaseCode=0&loggerCP=/즉시견적/물품정보 검색"/>
+  <area shape="rect" coords="-1,52,180,102"  alt="어린이제품KC인증몰" href="/S2BNCustomer/S2B/scrweb/remu/rema/searchengine/s2bCustomerSearch.jsp?loggerCP=/즉시견적/어린이제품kc인증&actionType=ONLY_CATEGORY&CERT_CODE_119=Y&kcMall=Y"/>
+  <area shape="rect" coords="-1,102,180,152" alt="중기간경쟁제품몰"   href="/S2BNCustomer/S2B/scrweb/remu/rema/searchengine/s2bCustomerSearch.jsp?loggerCP=/즉시견적/중기간경쟁제품 검색&actionType=ONLY_CATEGORY&searchField=ALL&categoryLevel1Code=142000000000"/>
+</map>
+</body>
+</html><!--leftmenu end--></td>
+								                    	</tr>
+								                  	</table>
+                  								</td>
+                  								<td width="20">&nbsp;</td>
+                  								<td width="780" valign="top">
+                  									<table width="780" border="0" cellspacing="0" cellpadding="0">
+                    									<tr>
+                      										<td class="td_pd"></td>
+                    									</tr>
+									                  	<tr>
+									                    	<td background="/S2BNCustomer/S2B/scrweb/images/tender/title_back_img.gif">
+									                    		<table width="780" border="0" cellspacing="0" cellpadding="0">
+												                	<tr>
+												                  		<td width="210"><img src="/S2BNCustomer/S2B/scrweb/images/condition/cont_title_01.gif" width="210" height="37" border="0" /></td>
+												                  		<td class="table_navi"><img src="/S2BNCustomer/S2B/scrweb/images/tender/dot_navi.gif" width="10" height="10" border="0" style="vertical-align:middle"/>HOME&gt;계약현황&gt;견적요청/소액수의공고 현황</td>
+												                	</tr>
+												              	</table>
+									                    	</td>
+                  										</tr>
+                  										<tr>
+                      										<td class="td_pd"></td>
+                    									</tr>
+                    									<tr>
+                      										<td>
+                      											<table id="searchArea" width="780" border="0" cellspacing="0" cellpadding="0" class="td_dark_line">
+                        											<colgroup>
+											                          	<col width="160" />
+											                          	<col width="230" />
+											                          	<col width="160" />
+											                         	<col width="230" />
+											                        </colgroup>
+																	<tr>
+														                <td class="td_dark_blue">
+														                	<select name="tender_sep1" style="width: 140px; " class="select_input"><option value="1" selected="selected">견적요청/공고명</option>
+														                    	<option value="2">견적요청/공고번호</option></select>
+																		</td>
+														                <td class="td_dark_gray"><input type="text" name="tender_name" maxlength="30" size="10" value="영상" style="width: 205px; ime-mode:active;" class="blue_input"></td>
+														                <td class="td_dark_blue">기관명</td>
+														                <td class="td_dark_gray"><input type="text" name="company_name_s" maxlength="20" size="10" value="" style="width: 205px; ime-mode:active;" class="blue_input"></td>
+																	</tr>
+													               	<tr>
+														                <td class="td_dark_blue">
+																			<select name="tender_sep2" style="width: 140px; " class="select_input"><option value="1" selected="selected">견적요청/공고일</option>
+														                    	<option value="2">견적서제출마감일</option></select>
+																		</td>
+														                <td class="td_dark_gray">
+														                	<input type="text" name="tender_date_start" maxlength="8" size="10" value="20261001" onkeypress="num_only(this);" onblur="javascript:tender_date_start_sel();" style="width: 70px; text-align:center; ime-mode:disabled;" class="blue_input">
+														                	<img src="/S2BNCustomer/S2B/scrweb/images/tender/icon_car.gif" width="18" height="18" border="0" style="cursor:hand" align="absmiddle" onclick="Calendar_D(document.all.tender_date_start)" /> 
+														                	~
+														                	<input type="text" name="tender_date_end" maxlength="8" size="10" value="20261111" onkeypress="num_only(this);" onblur="javascript:tender_date_end_sel();" style="width: 70px;text-align:center; ime-mode:disabled;" class="blue_input">
+														                	<img src="/S2BNCustomer/S2B/scrweb/images/tender/icon_car.gif" width="18" height="18" border="0" style="cursor:hand" align="absmiddle" onclick="Calendar_D(document.all.tender_date_end)" /></td>
+														                <td class="td_dark_blue">거래구분</td>
+														                <td class="td_dark_gray">
+														                	<select name="tender_item" style="width: 205px; " class="select_input"><option value="">전체</option>
+														                    	<option value="1">물품</option>
+														                    	<option value="2">공사</option>
+														                    	<option value="3" selected="selected">용역</option></select>
+														                </td>
+													              	</tr>
+													              	<tr>
+														                <td class="td_dark_blue">수의계약 구분</td>
+														                <td class="td_dark_gray">
+														                	<select name="estimate_kind" style="width: 205px; " class="select_input"><option value="" selected="selected">전체</option>
+														                    	<option value="1">1인수의계약</option>
+														                    	<option value="2">2인수의계약</option></select>
+														                 </td>
+														                <td class="td_dark_blue">지역</td>
+														                <td class="td_dark_gray">
+																			<select name="areaKind" style="width:50px;" class="select_input"><option value="전국" selected="selected">전국</option>
+<option value="강원">강원</option>
+<option value="경기">경기</option>
+<option value="경남">경남</option>
+<option value="경북">경북</option>
+<option value="광주">광주</option>
+<option value="대구">대구</option>
+<option value="대전">대전</option>
+<option value="부산">부산</option>
+<option value="서울">서울</option>
+<option value="울산">울산</option>
+<option value="인천">인천</option>
+<option value="전남">전남</option>
+<option value="전북">전북</option>
+<option value="제주">제주</option>
+<option value="충남">충남</option>
+<option value="충북">충북</option>
+<option value="세종">세종</option></select>
+														                </td>
+													              	</tr>
+            													</table> 
+            												</td>
+                  										</tr>
+									                 	<tr>
+									                    	<td class="content_pd"></td>
+									                  	</tr>
+									                  	<tr>
+									                    	<td class="td_dark_button">
+									                    		<a id="sa_btn" href="javascript:f_search();"><img src="/S2BNCustomer/S2B/scrweb/images/tender/table_btn_search.gif" width="58" height="22" border="0" style="cursor:hand" /></a>
+									                    	</td>
+									                  	</tr>
+									                  	<tr>
+									                    	<td class="td_pd"></td>
+									                  	</tr>
+                  										<tr>
+                     										<td>
+                												<!--리스트시작-->     
+                       											<table width="780" border="0" cellspacing="0" cellpadding="0" class="td_dark_line">
+											                      	<tr>
+											                        	<td rowspan="2" width="40" class="td_list_tit_01">NO</td>
+											                        	<td rowspan="2" width="70" class="td_list_tit_01">계약구분</td>
+											                        	<td width="80" class="td_list_tit_01">도서/산간</td>
+											                        	<td rowspan="2" width="110" class="td_list_tit_01">견적요청/공고번호</td>
+											                        	<td colspan="3" width="380" class="td_list_tit_01">견적요청/공고명</td>
+											                        	<td rowspan="2" width="100" class="td_list_tit_02">상태</td>
+											                      	</tr>
+											                      	<tr>
+											                        	<td width="80" class="td_list_tit_01">거래구분</td>
+											                        	<td width="170" class="td_list_tit_01">기관명</td>
+											                        	<td width="90" class="td_list_tit_01">공고일</td>
+											                        	<td width="120" class="td_list_tit_01">견적서제출마감일</td>
+											                      	</tr>
+											                      	
+											                      	
+																	
+											                      	
+											                      	<tr>
+												                        <td rowspan="2" class="td_list_white_c_01">1</td>
+												                        <td rowspan="2" class="td_list_white_c_01">1인 수의</td>
+												                        <td class="td_list_white_c_01">
+												                        	
+													                        	
+													                        	-
+												                        	
+												                        </td>
+												                        <td rowspan="2" class="td_list_white_c_01">202611111658805</td>
+												                        <td colspan="3" class="td_list_white_l_01">&nbsp;<a href="javascript:f_detail('202611111658805','1');">여수양지초등학교 오케스트라 정기연주회 무대설치 및 영상조명 임대용역</a></td>
+												                        <td rowspan="2" class="td_list_white_c_02">
+																			
+																				
+																				
+																					<img src="/S2BNCustomer/S2B/scrweb/images/main2012/bt_type011.gif" width="59" height="15" border="0" align="absmiddle">
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																															                        
+												                        
+												                        </td>
+											                      	</tr>
+											                      	<tr>
+												                        <td class="td_list_white_c_01">용역</td>
+											                        	<td class="td_list_white_l_01">&nbsp;여수양지초등학교</td>
+											                        	<td class="td_list_white_c_01">2026-11-11</td>
+											                        	<td class="td_list_white_c_01">2026-11-12 12:10</td>
+											                      	</tr>
+											                      	
+                      												
+											                      	
+																	
+											                      	
+															       <tr>
+												                        <td rowspan="2" class="td_list_sky_c_01">2</td>
+												                        <td rowspan="2" class="td_list_sky_c_01">1인 수의</td>
+												                        <td class="td_list_sky_c_01">
+																			
+													                        	
+													                        	-
+												                        	
+																		</td>
+												                        <td rowspan="2" class="td_list_sky_c_01">202611111656035</td>
+												                        <td colspan="3" class="td_list_sky_l_01">&nbsp;<a href="javascript:f_detail('202611111656035','1');">남명초등학교 부산교사합창단 정기연주회 영상촬영 견적 요청</a></td>
+												                        <td rowspan="2" class="td_list_sky_c_02">
+																			
+																				
+																				
+																					<img src="/S2BNCustomer/S2B/scrweb/images/main2012/bt_type011.gif" width="59" height="15" border="0" align="absmiddle">
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																															                        
+												                        </td>
+												                   </tr>
+												                   <tr>
+												                   		<td class="td_list_sky_c_01">용역</td>
+											                        	<td class="td_list_sky_l_01">&nbsp;남명초등학교</td>
+											                        	<td class="td_list_sky_c_01">2026-11-11</td>
+											                        	<td class="td_list_sky_c_01">2026-11-12 18:00</td>
+											                      	</tr>
+												                   
+                      												
+											                      	
+																	
+											                      	
+											                      	<tr>
+												                        <td rowspan="2" class="td_list_white_c_01">3</td>
+												                        <td rowspan="2" class="td_list_white_c_01">1인 수의</td>
+												                        <td class="td_list_white_c_01">
+												                        	
+													                        	
+													                        	-
+												                        	
+												                        </td>
+												                        <td rowspan="2" class="td_list_white_c_01">202611111655416</td>
+												                        <td colspan="3" class="td_list_white_l_01">&nbsp;<a href="javascript:f_detail('202611111655416','1');">주례여고 마을공공체 연계 행사 홍보 영상 추가 제작</a></td>
+												                        <td rowspan="2" class="td_list_white_c_02">
+																			
+																				
+																				
+																				
+																					<img src="/S2BNCustomer/S2B/scrweb/images/main2011/bt_type02.gif" width="59" height="15" border="0" align="absmiddle">
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																															                        
+												                        
+												                        </td>
+											                      	</tr>
+											                      	<tr>
+												                        <td class="td_list_white_c_01">용역</td>
+											                        	<td class="td_list_white_l_01">&nbsp;주례여자고등학교</td>
+											                        	<td class="td_list_white_c_01">2026-11-11</td>
+											                        	<td class="td_list_white_c_01">2026-11-13 11:00</td>
+											                      	</tr>
+											                      	
+                      												
+											                      	
+																	
+											                      	
+															       <tr>
+												                        <td rowspan="2" class="td_list_sky_c_01">4</td>
+												                        <td rowspan="2" class="td_list_sky_c_01">1인 수의</td>
+												                        <td class="td_list_sky_c_01">
+																			
+													                        	
+													                        	-
+												                        	
+																		</td>
+												                        <td rowspan="2" class="td_list_sky_c_01">202611101654738</td>
+												                        <td colspan="3" class="td_list_sky_l_01">&nbsp;<a href="javascript:f_detail('202611101654738','1');">2026년 제3기 학부모아카데미플러스 수료식 영상 제작의 건</a></td>
+												                        <td rowspan="2" class="td_list_sky_c_02">
+																			
+																				
+																				
+																					<img src="/S2BNCustomer/S2B/scrweb/images/main2012/bt_type011.gif" width="59" height="15" border="0" align="absmiddle">
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																															                        
+												                        </td>
+												                   </tr>
+												                   <tr>
+												                   		<td class="td_list_sky_c_01">용역</td>
+											                        	<td class="td_list_sky_l_01">&nbsp;부산광역시교육청 학생학부모지원과</td>
+											                        	<td class="td_list_sky_c_01">2026-11-11</td>
+											                        	<td class="td_list_sky_c_01">2026-11-13 09:00</td>
+											                      	</tr>
+												                   
+                      												
+											                      	
+																	
+											                      	
+											                      	<tr>
+												                        <td rowspan="2" class="td_list_white_c_01">5</td>
+												                        <td rowspan="2" class="td_list_white_c_01">1인 수의</td>
+												                        <td class="td_list_white_c_01">
+												                        	
+													                        	
+													                        	-
+												                        	
+												                        </td>
+												                        <td rowspan="2" class="td_list_white_c_01">202611101654014</td>
+												                        <td colspan="3" class="td_list_white_l_01">&nbsp;<a href="javascript:f_detail('202611101654014','1');">2026년 과학해양전시관 천체과학실 복도 프로젝션용 영상물 및 액자 제작 용역</a></td>
+												                        <td rowspan="2" class="td_list_white_c_02">
+																			
+																				
+																				
+																				
+																				
+																				
+																					<img src="/S2BNCustomer/S2B/scrweb/images/main2011/bt_type04.gif" width="59" height="15" border="0" align="absmiddle">
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																															                        
+												                        
+												                        </td>
+											                      	</tr>
+											                      	<tr>
+												                        <td class="td_list_white_c_01">용역</td>
+											                        	<td class="td_list_white_l_01">&nbsp;부산광역시교육청창의융합교육원</td>
+											                        	<td class="td_list_white_c_01">2026-11-10</td>
+											                        	<td class="td_list_white_c_01">2026-11-13 18:00</td>
+											                      	</tr>
+											                      	
+                      												
+											                      	
+																	
+											                      	
+															       <tr>
+												                        <td rowspan="2" class="td_list_sky_c_01">6</td>
+												                        <td rowspan="2" class="td_list_sky_c_01">1인 수의</td>
+												                        <td class="td_list_sky_c_01">
+																			
+													                        	
+													                        	-
+												                        	
+																		</td>
+												                        <td rowspan="2" class="td_list_sky_c_01">202611101652447</td>
+												                        <td colspan="3" class="td_list_sky_l_01">&nbsp;<a href="javascript:f_detail('202611101652447','1');">부산영상예술고 냉난방기 종합세척 견적 요청</a></td>
+												                        <td rowspan="2" class="td_list_sky_c_02">
+																			
+																				
+																				
+																				
+																					<img src="/S2BNCustomer/S2B/scrweb/images/main2011/bt_type02.gif" width="59" height="15" border="0" align="absmiddle">
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																															                        
+												                        </td>
+												                   </tr>
+												                   <tr>
+												                   		<td class="td_list_sky_c_01">용역</td>
+											                        	<td class="td_list_sky_l_01">&nbsp;부산영상예술고등학교</td>
+											                        	<td class="td_list_sky_c_01">2026-11-10</td>
+											                        	<td class="td_list_sky_c_01">2026-11-16 10:00</td>
+											                      	</tr>
+												                   
+                      												
+											                      	
+																	
+											                      	
+											                      	<tr>
+												                        <td rowspan="2" class="td_list_white_c_01">7</td>
+												                        <td rowspan="2" class="td_list_white_c_01">1인 수의</td>
+												                        <td class="td_list_white_c_01">
+												                        	
+													                        	
+													                        	-
+												                        	
+												                        </td>
+												                        <td rowspan="2" class="td_list_white_c_01">202611101652061</td>
+												                        <td colspan="3" class="td_list_white_l_01">&nbsp;<a href="javascript:f_detail('202611101652061','1');">충북교육영상제 차량임차 용역 청주, 옥천</a></td>
+												                        <td rowspan="2" class="td_list_white_c_02">
+																			
+																				
+																				
+																				
+																				
+																				
+																				
+																					<img src="/S2BNCustomer/S2B/scrweb/images/main2011/bt_type13.gif" width="59" height="15" border="0" align="absmiddle">
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																															                        
+												                        
+												                        </td>
+											                      	</tr>
+											                      	<tr>
+												                        <td class="td_list_white_c_01">용역</td>
+											                        	<td class="td_list_white_l_01">&nbsp;충청북도교육연구정보원</td>
+											                        	<td class="td_list_white_c_01">2026-11-10</td>
+											                        	<td class="td_list_white_c_01">2026-11-13 11:20</td>
+											                      	</tr>
+											                      	
+                      												
+											                      	
+																	
+											                      	
+															       <tr>
+												                        <td rowspan="2" class="td_list_sky_c_01">8</td>
+												                        <td rowspan="2" class="td_list_sky_c_01">1인 수의</td>
+												                        <td class="td_list_sky_c_01">
+																			
+													                        	
+													                        	-
+												                        	
+																		</td>
+												                        <td rowspan="2" class="td_list_sky_c_01">202611101650746</td>
+												                        <td colspan="3" class="td_list_sky_l_01">&nbsp;<a href="javascript:f_detail('202611101650746','1');">2026학년도 영상정보처리기기(CCTV) 수리</a></td>
+												                        <td rowspan="2" class="td_list_sky_c_02">
+																			
+																				
+																				
+																				
+																				
+																				
+																					<img src="/S2BNCustomer/S2B/scrweb/images/main2011/bt_type04.gif" width="59" height="15" border="0" align="absmiddle">
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																															                        
+												                        </td>
+												                   </tr>
+												                   <tr>
+												                   		<td class="td_list_sky_c_01">용역</td>
+											                        	<td class="td_list_sky_l_01">&nbsp;부산아미초등학교</td>
+											                        	<td class="td_list_sky_c_01">2026-11-10</td>
+											                        	<td class="td_list_sky_c_01">2026-11-11 18:00</td>
+											                      	</tr>
+												                   
+                      												
+											                      	
+																	
+											                      	
+											                      	<tr>
+												                        <td rowspan="2" class="td_list_white_c_01">9</td>
+												                        <td rowspan="2" class="td_list_white_c_01">1인 수의</td>
+												                        <td class="td_list_white_c_01">
+												                        	
+													                        	
+													                        	-
+												                        	
+												                        </td>
+												                        <td rowspan="2" class="td_list_white_c_01">202611091649222</td>
+												                        <td colspan="3" class="td_list_white_l_01">&nbsp;<a href="javascript:f_detail('202611091649222','1');">2026학년도 제3회 동삼예술교육 정기연주회 영상 촬영 및 편집</a></td>
+												                        <td rowspan="2" class="td_list_white_c_02">
+																			
+																				
+																				
+																				
+																				
+																				
+																					<img src="/S2BNCustomer/S2B/scrweb/images/main2011/bt_type04.gif" width="59" height="15" border="0" align="absmiddle">
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																															                        
+												                        
+												                        </td>
+											                      	</tr>
+											                      	<tr>
+												                        <td class="td_list_white_c_01">용역</td>
+											                        	<td class="td_list_white_l_01">&nbsp;동삼초등학교</td>
+											                        	<td class="td_list_white_c_01">2026-11-09</td>
+											                        	<td class="td_list_white_c_01">2026-11-10 18:30</td>
+											                      	</tr>
+											                      	
+                      												
+											                      	
+																	
+											                      	
+															       <tr>
+												                        <td rowspan="2" class="td_list_sky_c_01">10</td>
+												                        <td rowspan="2" class="td_list_sky_c_01">1인 수의</td>
+												                        <td class="td_list_sky_c_01">
+																			
+													                        	
+													                        	-
+												                        	
+																		</td>
+												                        <td rowspan="2" class="td_list_sky_c_01">202611091647984</td>
+												                        <td colspan="3" class="td_list_sky_l_01">&nbsp;<a href="javascript:f_detail('202611091647984','1');">단성중학교 교육활동 홍보영상 제작</a></td>
+												                        <td rowspan="2" class="td_list_sky_c_02">
+																			
+																				
+																				
+																				
+																				
+																				
+																				
+																					<img src="/S2BNCustomer/S2B/scrweb/images/main2011/bt_type13.gif" width="59" height="15" border="0" align="absmiddle">
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																				
+																															                        
+												                        </td>
+												                   </tr>
+												                   <tr>
+												                   		<td class="td_list_sky_c_01">용역</td>
+											                        	<td class="td_list_sky_l_01">&nbsp;단성중학교</td>
+											                        	<td class="td_list_sky_c_01">2026-11-09</td>
+											                        	<td class="td_list_sky_c_01">2026-11-11 18:00</td>
+											                      	</tr>
+												                   
+                      												
+																	 
+                  												</table>
+               													<!--리스트 끝-->
+           													</td>
+              											</tr>
+              											<tr>
+                      										<td>
+                      											<!--페이징시작-->
+                      											<table width="780" border="0" cellspacing="0" cellpadding="0">
+                        											<tr>
+                          												<td height="40" align="center"><img src="/S2BNCustomer/S2B/scrweb/images/sub/btn_f_pre.gif" width="13" height="11"> <img src="/S2BNCustomer/S2B/scrweb/images/sub/btn_pre.gif" width="11" height="11">  <b><font color="#308619">1</font></b>  <a href='javascript:goList(2)'>2 </a>  <a href='javascript:goList(3)'>3 </a>  <a href='javascript:goList(4)'>4 </a>  <a href='javascript:goList(5)'>5 </a>  <a href='javascript:goList(6)'>6 </a>  <a href='javascript:goList(7)'>7 </a>  <a href='javascript:goList(8)'>8 </a>  <a href='javascript:goList(9)'>9 </a>  <a href='javascript:goList(10)'>10 </a>  <a href='javascript:goList(11)'><img src="/S2BNCustomer/S2B/scrweb/images/sub/btn_next.gif" width="11" height="11"> </a>  <a href='javascript:goList(11)'><img src="/S2BNCustomer/S2B/scrweb/images/sub/btn_l_next.gif" width="13" height="11"> </a> </td>
+                        											</tr>
+                      											</table>
+                      											<!--페이징끝-->
+                      										</td>
+                    									</tr>
+                 									</table>
+                 								</td>
+              								</tr>
+            							</table>            
+            						</td>
+          						</tr>
+          						<tr>
+              						<td><!--footer start-->
+
+
+
+<script language="javascript">
+
+  function openWinCenter(url,wname, wopt) {
+    var newopt = "", wHeight = 0, wWidth = 0;
+    if (wopt != undefined) {
+        var woptlist = wopt.replace(/ /g, "").split(",");
+        for (var i in woptlist) {
+            if (woptlist[i].match(/^height=/i)) {
+                wHeight = parseInt(woptlist[i].substr(7),10);
+                if (!isNaN(wHeight)) newopt += "top=" + Math.floor((screen.availHeight - wHeight) / 2) + ",";
+            }
+            if (woptlist[i].match(/^width=/i)) {
+                wWidth = parseInt(woptlist[i].substr(6),10);
+                if (!isNaN(wWidth)) newopt += "left=" + Math.floor((screen.availWidth - wWidth) / 2) + ",";
+            }
+        }
+    }
+	
+    
+    return window.open(url, wname, newopt + wopt);
+    
+  }
+
+	function openPrivacyPopup(){
+		
+    	openWinCenter('http://s2b.teachiworld.com/S2BNCustomer/S2B/scrweb/html_include/view_privacy.jsp','','width=670, height=700 , fullscreen=no, location=no, scrollbars=yes, menubar=no, toolbar=no, titlebar=no, directories=no, resizable=no');
+	}
+
+	function openServicePopup(){
+    	openWinCenter('http://s2b.teachiworld.com/S2BNCustomer/S2B/scrweb/html_include/view_service.jsp','','width=670, height=700 , fullscreen=no, location=no, scrollbars=yes, menubar=no, toolbar=no, titlebar=no, directories=no, resizable=no');
+	}
+
+</script>
+<center>
+<table width="980" border="0" cellspacing="0" cellpadding="0">
+	<tr><td height="20" colspan="2"></td></tr>
+	<tr><td colspan="2"><img src="/S2BNCustomer/S2B/scrweb/images/main2011/tail_hline_980.gif" /></td></tr>
+	
+    <tr>
+    	<td align="left" width="650">
+        	<table height="34">
+            <tr>
+            	<td width="26"></td>
+            	<td><a href="https://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/s2b_info01_intro.jsp"><img src="/S2BNCustomer/S2B/scrweb/images/main2011/tail_menu01.gif" border="0" /></a></td>
+            	<td><img src="/S2BNCustomer/S2B/scrweb/images/main2011/tail_vline.gif" style="margin-left:15px; margin-right:15px;" /></td>
+            	<td><a href="https://www.s2b.kr/S2BNCustomer/customer600.do?forwardName=board2&division=7"><img src="/S2BNCustomer/S2B/scrweb/images/main2011/tail_menu02.gif" border="0" /></a></td>
+           		<td><img src="/S2BNCustomer/S2B/scrweb/images/main2011/tail_vline.gif" style="margin-left:15px; margin-right:15px;" /></td>
+            	<td><a href="https://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/s2b_use_info01.jsp"><img src="/S2BNCustomer/S2B/scrweb/images/main2011/tail_menu03.gif" border="0" /></a></td>
+            	<td><img src="/S2BNCustomer/S2B/scrweb/images/main2011/tail_vline.gif" style="margin-left:15px; margin-right:15px;" /></td>
+            	 
+            	<td><a href="https://www.s2b.kr/S2BNCustomer/checkSchool.do"><img src="/S2BNCustomer/S2B/scrweb/images/main2011/tail_menu04.gif" border="0" /></a></td>
+            	<td><img src="/S2BNCustomer/S2B/scrweb/images/main2011/tail_vline.gif" style="margin-left:15px; margin-right:15px;" /></td>
+            	<td><a href="https://www.s2b.kr/S2BNCustomer/personal100.do"><img src="/S2BNCustomer/S2B/scrweb/images/main2011/tail_menu05.gif" border="0" /></a></td>
+                <td><img src="/S2BNCustomer/S2B/scrweb/images/main2011/tail_vline.gif" style="margin-left:15px; margin-right:15px;" /></td>
+            	<td><a href="https://www.s2b.kr/S2BNCustomer/m_left.do?forwardName=searchBusinessNum&gubun=business"><img src="/S2BNCustomer/S2B/scrweb/images/main2011/tail_menu06.gif" border="0" /></a></td>
+               
+                <td><img src="/S2BNCustomer/S2B/scrweb/images/main2011/tail_vline.gif" style="margin-left:15px; margin-right:15px;" /></td>
+            	 
+            	<td><a href="https://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/s2b_faq_school.jsp"><img src="/S2BNCustomer/S2B/scrweb/images/main2011/tail_menu07.gif" border="0" /></a></td>
+                <td><img src="/S2BNCustomer/S2B/scrweb/images/main2011/tail_vline.gif" style="margin-left:15px; margin-right:15px;" /></td>
+            	<td><a href="https://www.s2b.kr/S2BNCustomer/S2B/scrweb/common/s2b_info10_center.jsp"><img src="/S2BNCustomer/S2B/scrweb/images/main2011/tail_menu08.gif" border="0" /></a></td>
+            </tr>
+            </table>
+        </td>
+        <td align="right" width="330">
+            <a href="http://blog.naver.com/the-ks2b" target="_blank" style="text-decoration : none; color : black;">
+                <img src="/S2BNCustomer/S2B/scrweb/images/main2019/bot_i_blog.png" style="margin-right:7px;" onmouseover='this.src="/S2BNCustomer/S2B/scrweb/images/main2019/bot_i_blog_ov.png"' onmouseout='this.src="/S2BNCustomer/S2B/scrweb/images/main2019/bot_i_blog.png"' />
+            </a>
+            <a href="https://www.instagram.com/withs2b/" target="_blank" style="text-decoration : none; color : black;">
+                <img src="/S2BNCustomer/S2B/scrweb/images/main2019/bot_i_instagram.png" style="margin-right:7px;" onmouseover='this.src="/S2BNCustomer/S2B/scrweb/images/main2019/bot_i_instagram_ov.png"' onmouseout='this.src="/S2BNCustomer/S2B/scrweb/images/main2019/bot_i_instagram.png"' />
+            </a>
+            <a href="https://www.facebook.com/s2b.kr/?ref=bookmarks" target="_blank" style="text-decoration : none; color : black;">
+                <img src="/S2BNCustomer/S2B/scrweb/images/main2019/bot_i_facebook.png" style="margin-right:7px;" onmouseover='this.src="/S2BNCustomer/S2B/scrweb/images/main2019/bot_i_facebook_ov.png"' onmouseout='this.src="/S2BNCustomer/S2B/scrweb/images/main2019/bot_i_facebook.png"' />
+            </a>
+            <a href="https://www.youtube.com/channel/UCo6IZie9tJbjCmCANvyZ-Tg" target="_blank" style="text-decoration : none; color : black;">
+                <img src="/S2BNCustomer/S2B/scrweb/images/main2019/bot_i_youtube.png" style="margin-right:7px;" onmouseover='this.src="/S2BNCustomer/S2B/scrweb/images/main2019/bot_i_youtube_ov.png"' onmouseout='this.src="/S2BNCustomer/S2B/scrweb/images/main2019/bot_i_youtube.png"' />
+            </a>
+        </td>
+    </tr>
+    
+    <tr><td colspan="2"><img src="/S2BNCustomer/S2B/scrweb/images/main2011/tail_line_gray.gif" height="1" width="980" /></td></tr>
+
+
+    <tr>
+      <td colspan="2"><img src="/S2BNCustomer/S2B/scrweb/images/main2020/copyright.gif" border="0" usemap="#copyright" style="margin-top:20px; margin-left:15px; margin-bottom:20px;" /></td>
+    </tr> 
+	<map name="copyright" id="copyright">
+	  <!--area shape="rect" coords="0,2,194,37" href="/S2BNCustomer/S2B/index.jsp" /-->
+	  <area shape="rect" coords="0,2,194,37" href="http://www.ktcu.or.kr/" target="_blank"/>
+	  <area shape="rect" coords="689,2,783,12" href="mailto:s2b@s2b.kr" />
+	</map>
+
+</table>  
+</center> 
+
+
+
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-173155725-2"></script>
+<script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'UA-173155725-2');
+</script>
+<!--  Naver Analytics -->
+<script async type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
+<script type="text/javascript">
+	if(!wcs_add) var wcs_add = {};
+	wcs_add["wa"] = "79da37dc102d30";
+	if(window.wcs) {
+		wcs_do();
+	}
+</script>
+
+
+<!-- logger 수집용 : S -->
+<script language="JavaScript" src="/S2BNCustomer/S2B/scrweb/js/logger.js"></script>
+<!-- logger 수집용 : E -->
+
+<!--footer end--></td>
+            					</tr>
+        					</table>
+        				</td>
+      				</tr>
+    			</table>
+    		</td>
+  		</tr>
+	</table>
+</body>
+</form>
+</html>

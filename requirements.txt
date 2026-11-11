@@ -1,0 +1,5 @@
+requests>=2.31
+beautifulsoup4>=4.12
+pyyaml>=6.0
+anthropic>=2.8
+olefile>=0.47
