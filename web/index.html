@@ -300,7 +300,7 @@ const AMOUNT_LABEL = { "입찰공고": "추정가격", "사전규격": "배정�
 
 function isHighlight(n) {
   const t = (n.title || "").replace(/\s/g, "");
-  return (DATA.highlight || []).some(k => k && t.includes(k.replace(/\s/g, "")));
+  return (DATA.highlight || ["홍보영상", "홍보동영상"]).some(k => k && t.includes(k.replace(/\s/g, "")));
 }
 
 function card(n) {
