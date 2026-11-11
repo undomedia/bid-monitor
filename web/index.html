@@ -150,7 +150,7 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 const G2B = ["발주계획", "사전규격", "입찰공고"];
 const TAB_DESC = {
   "입찰공고": "지금 입찰 가능한 공고 · 마감 지난 공고는 숨김",
-  "사전규격": "곧 입찰로 나올 사업 · 첨부된 제안요청서(안)로 미리 준비하세요",
+  "사전규격": "곧 입찰로 나올 사업 · 첨부된 제안요청서(안)로 미리 준비하세요 · 의견마감 지난 공고는 숨김",
   "발주계획": "기관이 올해 발주할 예정인 사업 · 예산과 발주 시기를 미리 파악",
   "학교장터": "학교·교육청의 소액 견적요청 (학교 홍보영상, 행사 촬영 등) · 마감 지난 공고는 숨김",
   "방송사 공모": "방송사 외주제작·기획안 공모와 방송 제작지원 사업 (KBS·MBC·SBS·EBS·종편·YTN·콘진원 등)",
@@ -240,9 +240,9 @@ function deadlineDate(n) {
   const d = new Date(s);
   return isNaN(d) ? null : d;
 }
-// 사전규격의 마감은 '의견등록 마감'일 뿐이라 지나도 숨기지 않음 (곧 입찰공고가 나올 사업)
+// 마감(사전규격은 의견등록 마감)이 지나면 숨김. 발주계획은 마감일이 없음
 function isExpired(n) {
-  if (n.category === "사전규격" || n.category === "발주계획") return false;
+  if (n.category === "발주계획") return false;
   const d = deadlineDate(n); return d ? d < new Date() : false;
 }
 
