@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>영상제작 공고 모니터</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-title" content="공고모니터">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1c3fb8">
+<style>
+:root {
+  --bg:#f6f7f9; --card:#fff; --text:#1d2129; --sub:#6b7280; --line:#e5e7eb;
+  --accent:#2563eb; --accent-bg:#eff4ff; --warn:#b45309; --warn-bg:#fff7e6;
+  --danger:#dc2626; --ok:#15803d; --new:#7c3aed;
+  --plan:#0e7490; --prespec:#9333ea; --bid:#2563eb; --req:#c2410c;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:#111318; --card:#1a1d24; --text:#e6e8ec; --sub:#9aa1ad; --line:#2a2e37;
+    --accent:#6b9bff; --accent-bg:#1c2640; --warn:#f0b35a; --warn-bg:#2d2416;
+    --danger:#f87171; --ok:#4ade80; --new:#b794f6;
+    --plan:#22b8cf; --prespec:#c084fc; --bid:#6b9bff; --req:#fb923c;
+  }
+}
+* { box-sizing:border-box }
+body { margin:0; background:var(--bg); color:var(--text);
+  font:15px/1.5 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif }
+.wrap { max-width:980px; margin:0 auto; padding:16px }
+header { display:flex; align-items:baseline; justify-content:space-between; gap:8px; flex-wrap:wrap }
+h1 { font-size:20px; margin:4px 0 }
+.updated { color:var(--sub); font-size:13px }
+.tabs { display:flex; gap:2px; margin:14px 0 6px; border-bottom:1px solid var(--line); overflow-x:auto; scrollbar-width:none }
+.tab { white-space:nowrap }
+.tabdesc { color:var(--sub); font-size:13px; margin:0 0 10px }
+.tab { border:0; background:none; color:var(--sub); font:inherit; font-weight:600; padding:10px 14px;
+  cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px }
+.tab.on { color:var(--accent); border-color:var(--accent) }
+.tab .n { font-weight:500; font-size:13px; margin-left:4px }
+.bar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px }
+.chip { border:1px solid var(--line); background:var(--card); color:var(--text); border-radius:999px;
+  padding:5px 12px; font:inherit; font-size:13px; cursor:pointer }
+.chip.on { background:var(--accent-bg); border-color:var(--accent); color:var(--accent); font-weight:600 }
+input[type=search], select { font:inherit; font-size:14px; padding:7px 10px; border:1px solid var(--line);
+  border-radius:8px; background:var(--card); color:var(--text) }
+input[type=search] { flex:1; min-width:160px }
+label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; gap:4px; cursor:pointer }
+.alert { background:var(--warn-bg); color:var(--warn); border-radius:8px; padding:8px 12px; font-size:13px; margin:8px 0 }
+.alert summary { cursor:pointer }
+.list { display:flex; flex-direction:column; gap:8px }
+.item { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 14px;
+  display:grid; grid-template-columns:1fr auto; gap:4px 12px }
+.item.expired { opacity:.55 }
+.item .t { font-weight:600; color:var(--text); text-decoration:none; word-break:keep-all; overflow-wrap:anywhere }
+.item .t:hover { color:var(--accent) }
+.meta { color:var(--sub); font-size:13px; display:flex; gap:4px 10px; flex-wrap:wrap; grid-column:1 }
+.desc { color:var(--sub); font-size:13px; grid-column:1 }
+.side { grid-row:1 / span 2; grid-column:2; display:flex; align-items:center; gap:8px; align-self:start }
+.badge { font-size:12px; font-weight:700; padding:1px 7px; border-radius:5px; border:1px solid currentColor; white-space:nowrap }
+.st-발주계획 { color:var(--plan) } .st-사전규격 { color:var(--prespec) } .st-입찰공고 { color:var(--bid) }
+.st-req { color:var(--req) } .st-학교장터 { color:var(--ok) }
+.new { color:var(--new); font-size:12px; font-weight:700 }
+.dday { font-size:13px; font-weight:700; white-space:nowrap }
+.dday.urgent { color:var(--danger) } .dday.soon { color:var(--warn) } .dday.past { color:var(--sub); font-weight:500 }
+.amt { font-weight:600; color:var(--text) }
+.acts { display:flex; gap:2px }
+.acts button { border:0; background:none; color:var(--sub); cursor:pointer; font-size:16px; padding:2px 4px; border-radius:4px }
+.acts button:hover { background:var(--bg) }
+.acts .star.on { color:#eab308 }
+.more { grid-column:1 / -1; margin-top:4px }
+.more summary { cursor:pointer; color:var(--accent); font-size:13px; list-style:none; display:inline-block }
+.more summary::-webkit-details-marker { display:none }
+.more[open] summary { margin-bottom:8px }
+.facts { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:6px 16px;
+  background:var(--bg); border-radius:8px; padding:10px 12px; font-size:13px }
+.facts div { display:flex; gap:8px; min-width:0 }
+.facts dt { color:var(--sub); flex:0 0 auto; margin:0 }
+.facts dd { margin:0; font-weight:600; overflow-wrap:anywhere }
+.facts .hl dd { color:var(--accent) }
+.files { margin:10px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:4px; font-size:13px }
+.files a { color:var(--text); text-decoration:none; display:inline-flex; gap:6px; align-items:baseline }
+.files a:hover { color:var(--accent); text-decoration:underline }
+.files .ext { font-size:11px; font-weight:700; color:var(--sub); border:1px solid var(--line); border-radius:4px; padding:0 4px }
+.ai { margin-top:10px; border:1px solid var(--line); border-radius:8px; padding:10px 12px; font-size:13px }
+.ai h4 { margin:0 0 6px; font-size:13px; display:flex; align-items:center; gap:6px }
+.ai h4 .tag { font-size:11px; font-weight:700; color:var(--new); border:1px solid currentColor; border-radius:4px; padding:0 4px }
+.ai .sum { margin:0 0 8px }
+.ai .kv { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:4px 16px; margin-bottom:8px }
+.ai .kv b { color:var(--sub); font-weight:500; margin-right:6px }
+.ai .sec { margin-top:8px }
+.ai .sec > b { display:block; margin-bottom:2px }
+.ai .sec.track { background:var(--accent-bg); border-radius:6px; padding:6px 10px }
+.ai .sec.track > b { color:var(--accent) }
+.ai ul { margin:0; padding-left:18px }
+.ai table { border-collapse:collapse; width:100%; margin-top:2px }
+.ai td, .ai th { border-top:1px solid var(--line); padding:3px 6px; text-align:left; vertical-align:top }
+.ai th { color:var(--sub); font-weight:500 }
+.ai td.pt { white-space:nowrap; font-weight:700; text-align:right }
+.ai .err { color:var(--warn) }
+.ai .src { color:var(--sub); font-size:12px; margin-top:8px }
+.badge-ai { font-size:11px; font-weight:700; color:var(--new) }
+.link-stage { font-size:12px; font-weight:700; color:var(--ok) }
+.empty { text-align:center; color:var(--sub); padding:48px 0 }
+.foot { color:var(--sub); font-size:12px; margin:24px 0 8px; text-align:center }
+@media (max-width:560px) {
+  .item { grid-template-columns:1fr }
+  .side { grid-row:auto; grid-column:1; flex-direction:row; align-items:center; justify-content:space-between }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🎬 영상제작 공고 모니터</h1>
+    <span class="updated" id="updated"></span>
+  </header>
+  <div id="alerts"></div>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab on" data-tab="입찰공고">입찰공고<span class="n"></span></button>
+    <button class="tab" data-tab="사전규격">사전규격<span class="n"></span></button>
+    <button class="tab" data-tab="발주계획">발주계획<span class="n"></span></button>
+    <button class="tab" data-tab="학교장터">학교장터<span class="n"></span></button>
+    <button class="tab" data-tab="req">제작 의뢰·공모<span class="n"></span></button>
+    <button class="tab" data-tab="star">★ 관심<span class="n"></span></button>
+  </nav>
+  <p class="tabdesc" id="tabdesc"></p>
+  <div class="bar">
+    <input type="search" id="q" placeholder="제목·기관 검색">
+    <select id="sort">
+      <option value="new">최신순</option>
+      <option value="deadline">마감 임박순</option>
+      <option value="amount">금액 큰 순</option>
+    </select>
+    <label class="tog"><input type="checkbox" id="showExpired"> 마감 지난 공고 보기</label>
+    <label class="tog"><input type="checkbox" id="showHidden"> 숨긴 공고 보기</label>
+  </div>
+
+  <div class="list" id="list"></div>
+  <div class="foot">마감일·금액은 원문을 꼭 확인하세요 · 별표/숨김은 이 브라우저에만 저장됩니다</div>
+</div>
+
+<script>
+const G2B = ["발주계획", "사전규격", "입찰공고"];
+const TAB_DESC = {
+  "입찰공고": "지금 입찰 가능한 공고 · 마감 지난 공고는 숨김",
+  "사전규격": "곧 입찰로 나올 사업 · 첨부된 제안요청서(안)로 미리 준비하세요",
+  "발주계획": "기관이 올해 발주할 예정인 사업 · 예산과 발주 시기를 미리 파악",
+  "학교장터": "학교·교육청의 소액 견적요청 (학교 홍보영상, 행사 촬영 등) · 마감 지난 공고는 숨김",
+  "req": "네이버 카페·블로그·뉴스 등에서 찾은 영상 제작 의뢰·업체 모집·공모",
+  "star": "★ 표시한 공고",
+};
+const state = { tab: "입찰공고", q: "", sort: "new", showExpired: false, showHidden: false };
+let DATA = { notices: [], sources: [] };
+let latestRun = "";
+let bidBySpec = {}, specByNo = {};   // 사전규격 ↔ 입찰공고 연결
+const HIGHLIGHT = ["추정가격", "배정예산", "발주금액", "낙찰방법", "입찰마감", "제안서 제출", "개찰일시", "지역제한"];
+
+function fileExt(name) { const m = /\.([a-z0-9]{2,5})$/i.exec(name || ""); return m ? m[1].toUpperCase() : "파일"; }
+
+function details(n) {
+  const info = Object.entries(n.info || {});
+  const files = n.files || [];
+  const ai = aiBlock(n);
+  if (!info.length && !files.length && !ai) return "";
+  const facts = info.map(([k, v]) =>
+    `<div class="${HIGHLIGHT.includes(k) ? "hl" : ""}"><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
+  const fl = files.map(f =>
+    `<li><a href="${esc(f.url)}" target="_blank" rel="noopener" download><span class="ext">${fileExt(f.name)}</span>${esc(f.name)}</a></li>`).join("");
+  const label = [n.analysis && n.analysis.ok && "AI 분석", info.length && "주요내용", files.length && `첨부서류 ${files.length}개`].filter(Boolean).join(" · ");
+  return `<details class="more"><summary>▸ ${label}</summary>
+    ${info.length ? `<dl class="facts">${facts}</dl>` : ""}
+    ${files.length ? `<ul class="files">${fl}</ul>` : ""}
+    ${ai}</details>`;
+}
+
+function list(items) {
+  return items && items.length ? `<ul>${items.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : "";
+}
+function scoreTable(rows) {
+  if (!rows || !rows.length) return "";
+  return `<table><tr><th>항목</th><th>배점</th><th>세부기준</th></tr>${rows.map(r =>
+    `<tr><td>${esc(r.item)}</td><td class="pt">${esc(r.points)}</td><td>${esc(r.detail)}</td></tr>`).join("")}</table>`;
+}
+function aiBlock(n) {
+  const a = n.analysis;
+  if (!a) return (n.files && n.files.length && ["입찰공고", "사전규격"].includes(n.category))
+    ? `<div class="ai"><h4><span class="tag">AI</span> 제안요청서 분석 대기 중</h4></div>` : "";
+  if (!a.ok) return `<div class="ai"><h4><span class="tag">AI</span> 분석 실패</h4><div class="err">${esc(a.error)}</div></div>`;
+  const kv = [["용역기간", a.period], ["사업예산", a.budget], ["계약방법", a.contract_method], ["기술:가격", a.tech_price_ratio]]
+    .filter(([, v]) => v).map(([k, v]) => `<div><b>${k}</b>${esc(v)}</div>`).join("");
+  const sec = (title, body, cls = "") => body ? `<div class="sec ${cls}"><b>${title}</b>${body}</div>` : "";
+  const dates = (a.key_dates || []).map(d => `${d.label}: ${d.date}`);
+  return `<div class="ai">
+    <h4><span class="tag">AI</span> 제안요청서 분석</h4>
+    ${a.summary ? `<p class="sum">${esc(a.summary)}</p>` : ""}
+    ${kv ? `<div class="kv">${kv}</div>` : ""}
+    ${sec("실적 평가 기준", list(a.track_record), "track")}
+    ${sec("정량평가", scoreTable(a.quantitative))}
+    ${sec("정성평가", scoreTable(a.qualitative))}
+    ${sec("참가자격", list(a.eligibility))}
+    ${sec("주요 일정", list(dates))}
+    ${sec("과업·납품물", list(a.deliverables))}
+    ${sec("준비 시 유의사항", list(a.notes))}
+    <div class="src">읽은 서류: ${esc((a.files_read || []).join(", "))}${a.not_found && a.not_found.length ? ` · 서류에서 못 찾음: ${esc(a.not_found.join(", "))}` : ""} · AI 요약이므로 원문을 꼭 확인하세요</div>
+  </div>`;
+}
+
+function stageLink(n) {
+  if (n.category === "사전규격" && bidBySpec[n.uid]) {
+    const b = bidBySpec[n.uid];
+    return `<a class="link-stage" href="${esc(b.url)}" target="_blank" rel="noopener">✔ 입찰공고 나옴 (마감 ${esc(b.deadline || "-")})</a>`;
+  }
+  if (n.category === "입찰공고" && n.info && specByNo[n.info["사전규격번호"]]) {
+    return `<span class="link-stage">사전규격 거친 사업</span>`;
+  }
+  return "";
+}
+
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k) || "[]"); } catch { return []; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+let stars = new Set(store.get("stars"));
+let hidden = new Set(store.get("hidden"));
+
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const isG2B = n => G2B.includes(n.category);
+
+function deadlineDate(n) {
+  if (!n.deadline) return null;
+  const s = n.deadline.length <= 10 ? n.deadline + "T23:59" : n.deadline.replace(" ", "T");
+  const d = new Date(s);
+  return isNaN(d) ? null : d;
+}
+// 사전규격의 마감은 '의견등록 마감'일 뿐이라 지나도 숨기지 않음 (곧 입찰공고가 나올 사업)
+function isExpired(n) {
+  if (n.category === "사전규격" || n.category === "발주계획") return false;
+  const d = deadlineDate(n); return d ? d < new Date() : false;
+}
+
+function dday(n) {
+  const d = deadlineDate(n);
+  if (!d) return "";
+  const today = new Date(); today.setHours(0,0,0,0);
+  const day = new Date(d); day.setHours(0,0,0,0);
+  const diff = Math.round((day - today) / 86400000);
+  const label = n.category === "사전규격" ? "의견마감 " : "마감 ";
+  if (d < new Date()) return `<span class="dday past">마감됨</span>`;
+  const cls = diff <= 2 ? "urgent" : diff <= 7 ? "soon" : "";
+  return `<span class="dday ${cls}">${label}${diff === 0 ? "D-DAY" : "D-" + diff}</span>`;
+}
+
+function won(a) {
+  if (!a) return "";
+  if (a >= 1e8) return (a / 1e8).toFixed(a >= 1e9 ? 0 : 1).replace(/\.0$/, "") + "억원";
+  return Math.round(a / 1e4).toLocaleString() + "만원";
+}
+
+function inTab(n, tab) {
+  if (tab === "star") return stars.has(n.id);
+  if (tab === "req") return !isG2B(n) && n.category !== "학교장터";
+  return n.category === tab;
+}
+
+function visible(n) {
+  if (!inTab(n, state.tab)) return false;
+  if (!state.showExpired && isExpired(n) && state.tab !== "star") return false;
+  if (!state.showHidden && hidden.has(n.id)) return false;
+  if (state.q) {
+    const hay = (n.title + " " + n.org + " " + (n.kind || "")).toLowerCase().replace(/\s/g, "");
+    if (!state.q.toLowerCase().split(/\s+/).every(w => hay.includes(w))) return false;
+  }
+  return true;
+}
+
+function sorted(list) {
+  const by = {
+    new: (a, b) => (b.posted || b.first_seen).localeCompare(a.posted || a.first_seen) || b.first_seen.localeCompare(a.first_seen),
+    deadline: (a, b) => (a.deadline || "9999").localeCompare(b.deadline || "9999"),
+    amount: (a, b) => (b.amount || 0) - (a.amount || 0),
+  }[state.sort];
+  return list.slice().sort(by);
+}
+
+function card(n) {
+  const own = isG2B(n) || n.category === "학교장터";
+  const stageCls = own ? "st-" + n.category : "st-req";
+  const stageLabel = own ? n.category : n.source_name;
+  const isNew = n.first_seen && n.first_seen.slice(0, 10) === latestRun.slice(0, 10);
+  const meta = [
+    n.org && `<span>${esc(n.org)}</span>`,
+    n.posted && `<span>게시 ${esc(n.posted)}</span>`,
+    n.deadline && `<span>마감 ${esc(n.deadline)}</span>`,
+    (isG2B(n) || n.category === "학교장터") && n.kind && `<span>${esc(n.kind)}</span>`,
+    n.amount && `<span class="amt">${won(n.amount)}</span>`,
+    n.analysis && n.analysis.ok && n.analysis.period && `<span class="badge-ai">기간 ${esc(n.analysis.period)}</span>`,
+    n.analysis && n.analysis.ok && n.analysis.tech_price_ratio && `<span class="badge-ai">기술:가격 ${esc(n.analysis.tech_price_ratio)}</span>`,
+  ].filter(Boolean).join("");
+  return `<div class="item ${isExpired(n) ? "expired" : ""}">
+    <a class="t" href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.title)}</a>
+    <div class="side">
+      <span class="badge ${stageCls}">${esc(stageLabel)}</span>
+      ${dday(n)}
+      <span class="acts">
+        <button class="star ${stars.has(n.id) ? "on" : ""}" data-star="${esc(n.id)}" title="관심">★</button>
+        <button data-hide="${esc(n.id)}" title="${hidden.has(n.id) ? "다시 보기" : "숨기기"}">${hidden.has(n.id) ? "↺" : "✕"}</button>
+      </span>
+    </div>
+    <div class="meta">${isNew ? '<span class="new">NEW</span>' : ""}${meta}${stageLink(n)}</div>
+    ${stageCls === "st-req" && n.kind ? `<div class="desc">${esc(n.kind)}</div>` : ""}
+    ${details(n)}
+  </div>`;
+}
+
+function countFor(pred) {
+  return DATA.notices.filter(n => pred(n) && (state.showExpired || !isExpired(n)) && !hidden.has(n.id)).length;
+}
+
+function render() {
+  document.querySelectorAll(".tab").forEach(b => {
+    b.classList.toggle("on", b.dataset.tab === state.tab);
+    const c = b.dataset.tab === "star" ? stars.size : countFor(n => inTab(n, b.dataset.tab));
+    b.querySelector(".n").textContent = c || "";
+  });
+  document.getElementById("tabdesc").textContent = TAB_DESC[state.tab] || "";
+
+  const items = sorted(DATA.notices.filter(visible));
+  document.getElementById("list").innerHTML = items.length
+    ? items.map(card).join("")
+    : `<div class="empty">${state.tab === "star" ? "★ 를 눌러 관심 공고를 모아보세요" : "조건에 맞는 공고가 없습니다"}</div>`;
+}
+
+function renderAlerts() {
+  const bad = DATA.sources.filter(s => s.ok === false);
+  if (!bad.length) { document.getElementById("alerts").innerHTML = ""; return; }
+  document.getElementById("alerts").innerHTML = `<details class="alert"><summary>⚠ 수집 실패 ${bad.length}곳 — 이 출처의 새 공고가 빠졌을 수 있습니다</summary>
+    ${bad.map(s => `<div>· <b>${esc(s.name)}</b>: ${esc(s.error)}${s.last_ok ? ` (마지막 성공 ${esc(s.last_ok)})` : ""}</div>`).join("")}</details>`;
+}
+
+document.getElementById("tabs").addEventListener("click", e => {
+  const b = e.target.closest(".tab"); if (!b) return;
+  state.tab = b.dataset.tab; render();
+});
+document.getElementById("q").addEventListener("input", e => { state.q = e.target.value.trim(); render(); });
+document.getElementById("sort").addEventListener("change", e => { state.sort = e.target.value; render(); });
+document.getElementById("showExpired").addEventListener("change", e => { state.showExpired = e.target.checked; render(); });
+document.getElementById("showHidden").addEventListener("change", e => { state.showHidden = e.target.checked; render(); });
+document.getElementById("list").addEventListener("click", e => {
+  const s = e.target.closest("[data-star]"), h = e.target.closest("[data-hide]");
+  if (s) { const id = s.dataset.star; stars.has(id) ? stars.delete(id) : stars.add(id); store.set("stars", [...stars]); render(); }
+  if (h) { const id = h.dataset.hide; hidden.has(id) ? hidden.delete(id) : hidden.add(id); store.set("hidden", [...hidden]); render(); }
+});
+
+fetch("data.json", { cache: "no-store" })
+  .then(r => r.json())
+  .then(d => {
+    DATA = d;
+    d.notices.forEach(n => {
+      if (n.category === "사전규격") specByNo[n.uid] = n;
+      if (n.category === "입찰공고" && n.info && n.info["사전규격번호"]) bidBySpec[n.info["사전규격번호"]] = n;
+    });
+    latestRun = d.notices.reduce((m, n) => n.first_seen > m ? n.first_seen : m, "");
+    document.getElementById("updated").textContent = "업데이트 " + d.generated;
+    renderAlerts(); render();
+  })
+  .catch(() => { document.getElementById("list").innerHTML = '<div class="empty">data.json 을 불러오지 못했습니다</div>'; });
+</script>
+</body>
+</html>

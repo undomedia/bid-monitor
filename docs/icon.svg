@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2f6bff"/>
+      <stop offset="1" stop-color="#1c3fb8"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- 클래퍼보드 윗부분 -->
+  <g transform="translate(96 118)">
+    <path d="M0 52 L292 0 L304 52 L12 104 Z" fill="#ffffff" opacity=".95" transform="translate(4 -10) rotate(-4)"/>
+    <path d="M48 44 l40 -7 l-26 52 l-40 7 Z M128 30 l40 -7 l-26 52 l-40 7 Z M208 16 l40 -7 l-26 52 l-40 7 Z"
+          fill="#1c3fb8" transform="translate(4 -10) rotate(-4)"/>
+    <!-- 본체 -->
+    <rect x="0" y="84" width="320" height="200" rx="28" fill="#ffffff"/>
+    <!-- 공고 목록 줄 -->
+    <rect x="34" y="124" width="176" height="22" rx="11" fill="#2f6bff"/>
+    <rect x="34" y="166" width="236" height="18" rx="9" fill="#c9d6ff"/>
+    <rect x="34" y="202" width="206" height="18" rx="9" fill="#c9d6ff"/>
+    <rect x="34" y="238" width="150" height="18" rx="9" fill="#c9d6ff"/>
+  </g>
+  <!-- 알림 점 -->
+  <circle cx="404" cy="372" r="54" fill="#ff5a3c" stroke="#ffffff" stroke-width="14"/>
+</svg>
