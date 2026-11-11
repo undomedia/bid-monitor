@@ -218,3 +218,12 @@ def test_redact_hides_keys(monkeypatch):
     msg = "HTTPError: 403 for url: https://x/y?serviceKey=abcdef1234567890&pageNo=1 (abcdef1234567890)"
     out = cli.redact(msg)
     assert "abcdef1234567890" not in out and "serviceKey=***" in out
+
+
+def test_board_url_contains_and_title_strip():
+    html = """<ul><li><a href="/kor/pr/release?postId=1">EBS 보도자료 제목입니다</a><span>2026.11.11</span></li>
+    <li><a href="/kor/notice/announce?postId=2">콘텐츠 제작사 공모 2026-10-28 조회 1,234</a><span>2026.10.28</span></li></ul>"""
+    src = {"id": "e", "url": "https://about.ebs.co.kr/kor/main/index", "url_contains": "/notice/announce",
+           "title_strip": r"\s*20\d\d-\d\d-\d\d\s*조회\s*[\d,]+\s*$"}
+    items = board.extract(html, src)
+    assert [n.title for n in items] == ["콘텐츠 제작사 공모"]

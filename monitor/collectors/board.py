@@ -129,6 +129,8 @@ def extract(html: str, source: dict) -> list[Notice]:
                 continue
 
         url = _resolve_link(a, row, source, base_url)
+        if source.get("url_contains") and source["url_contains"] not in url:
+            continue                                     # 같은 화면의 다른 게시판(보도자료 등) 제외
         uid = url if url != base_url else f"{title}|{posted}"
         if uid in seen:
             continue

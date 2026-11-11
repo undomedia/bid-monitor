@@ -60,7 +60,10 @@ sources:
     type: board
     name: EBS 공고
     category: 방송사 공모
-    url: https://about.ebs.co.kr/kor/notice/announce
+    # 공고 목록 페이지는 자바스크립트로 그려져서, 최신 공고가 보이는 EBS 소개 첫 화면에서 공고만 수집
+    url: https://about.ebs.co.kr/kor/main/index
+    url_contains: /notice/announce
+    filter: all
     keywords: &bc_kw [외주, 기획안, 제작사, 제작업체, 제작 업체, 콘텐츠 제작, 프로그램 공모, 프로그램 제작, 영상 제작, 영상제작, 다큐]
     exclude: &bc_ex [결과, 합격, 시청자위원, 평가위원, 모니터, 미디어렙, 채용, 개인정보, 공정성 평가, 종료, 세트]
     max_age_days: 120
@@ -115,7 +118,7 @@ sources:
     type: board
     name: 방송통신전파진흥원
     category: 방송사 공모
-    url: https://www.kca.kr/
+    url: https://www.kca.kr/boardList.do?pageId=www47&boardId=NOTICE
     keywords: [방송콘텐츠, 방송프로그램, 방송 프로그램, 제작지원, 제작 지원, 기획개발, 기획안, 외주]
     exclude: *bc_ex
     max_age_days: 120
