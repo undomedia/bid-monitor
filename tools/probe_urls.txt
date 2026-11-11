@@ -1,19 +1,5 @@
-# 2차 점검: 목록 페이지 확인 + KBS·SBS·종편 공지 페이지 후보
-https://about.ebs.co.kr/kor/notice/announce
-https://www.ktv.go.kr/board/list?board_id=35
-https://www.yonhapnewstv.co.kr/notice
-https://www.kocca.kr/kocca/pims/list.do?menuNo=204104
-https://www.kocca.kr/kocca/bbs/list/B0000204.do?categorys=2&subcate=50&cateCode=0&menuNo=204897
-https://www.kca.kr/
-# KBS
-https://office.kbs.co.kr/
-https://www.kbs.co.kr/kbs/notice/
-# SBS
-https://www.sbs.co.kr/notice
-https://sbsmedianet.sbs.co.kr/
-# 종편
-https://broadcast.tvchosun.com/
-https://www.tvchosun.com/notice
-https://jtbc.co.kr/notice
-https://www.mbn.co.kr/pages/notice/
-https://www.ichannela.com/
+# 3차 점검: 채널A 기획안 공모, EBS 공고 목록, 방송통신전파진흥원 공지 목록
+http://with.ichannela.com/?gid=outsourcing0001
+https://about.ebs.co.kr/kor/notice/announce?boardTypeId=34&boardId=10000140&cmd=list
+https://about.ebs.co.kr/kor/main/index
+https://www.kca.kr/boardList.do?pageId=www47&boardId=NOTICE
