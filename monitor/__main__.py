@@ -79,9 +79,18 @@ def build_site(store: Store, settings: dict, sources: list[dict], out_dir: Path)
         "notices": store.recent(int(settings.get("dashboard_days", 60)), with_analysis=True),
     }
     (out_dir / "data.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    # 화면 버전: index.html 이 바뀌면 값이 바뀜 → 앱이 예전 화면을 기억하고 있으면 스스로 새로 받음
+    import hashlib
+    page = (ROOT / "web" / "index.html").read_text(encoding="utf-8")
+    version = hashlib.sha1(page.encode("utf-8")).hexdigest()[:10]
     for f in (ROOT / "web").iterdir():          # index.html, 아이콘, manifest
-        if f.is_file():
+        if f.is_file() and f.name != "index.html":
             shutil.copy(f, out_dir / f.name)
+    (out_dir / "index.html").write_text(page.replace("__APP_VERSION__", version), encoding="utf-8")
+    data_path = out_dir / "data.json"
+    d = json.loads(data_path.read_text(encoding="utf-8"))
+    d["app_version"] = version
+    data_path.write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
 
 
 def cmd_run(args, settings, sources) -> int:

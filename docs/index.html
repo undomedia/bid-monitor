@@ -153,6 +153,7 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 </div>
 
 <script>
+const APP_VERSION = "bd95282cd6";
 const G2B = ["발주계획", "사전규격", "입찰공고"];
 const TAB_DESC = {
   "입찰공고": "지금 입찰 가능한 공고 · 마감 지난 공고는 숨김",
@@ -380,6 +381,11 @@ document.getElementById("list").addEventListener("click", e => {
 fetch("data.json", { cache: "no-store" })
   .then(r => r.json())
   .then(d => {
+    // 화면이 새로 바뀌었는데 예전 화면을 보고 있으면 새 화면으로 다시 열기 (한 번만)
+    if (d.app_version && d.app_version !== APP_VERSION && !location.search.includes("v=" + d.app_version)) {
+      location.replace(location.pathname + "?v=" + d.app_version);
+      return;
+    }
     DATA = d;
     d.notices.forEach(n => {
       if (n.category === "사전규격") specByNo[n.uid] = n;
