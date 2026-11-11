@@ -148,6 +148,11 @@ def analyze_notice(notice: dict, cfg: dict, client=None) -> dict:
     return result
 
 
+def _redact(text: str) -> str:
+    from .__main__ import redact
+    return redact(text)
+
+
 def run(store, settings: dict, now: str) -> None:
     cfg = settings.get("analysis", {}) or {}
     if not cfg.get("enabled", True):
@@ -172,7 +177,7 @@ def run(store, settings: dict, now: str) -> None:
             prev = store.analyses().get(n["id"], {})
             tries = prev.get("tries", 0) + 1
             store.set_analysis(n["id"], {"ok": False, "at": now, "tries": tries,
-                                         "error": f"{type(e).__name__}: {e}"[:300]},
+                                         "error": _redact(f"{type(e).__name__}: {e}")[:300]},
                                final=tries >= 3)
             print(f"[분석] ✘ {n['title'][:40]} — {e}")
     if len(todo) > limit:

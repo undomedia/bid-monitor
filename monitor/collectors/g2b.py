@@ -267,7 +267,11 @@ def collect(source: dict, lookback_days: float | None = None) -> list[Notice]:
                 "inqryEndDt": t2.strftime("%Y%m%d%H%M"),
             }
             r = session().get(f"{base}/{op}", params=params, timeout=40)
-            r.raise_for_status()
+            if r.status_code >= 400:
+                hint = {403: " — 이 API의 활용신청이 안 되었거나 아직 승인 전입니다 (공공데이터포털 마이페이지 확인)",
+                        401: " — 인증키가 올바르지 않습니다",
+                        429: " — 하루 호출 한도 초과"}.get(r.status_code, "")
+                raise RuntimeError(f"{defaults['category']} API 응답 오류 {r.status_code}{hint}")
             try:
                 payload = r.json()
             except ValueError:

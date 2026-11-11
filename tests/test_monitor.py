@@ -90,6 +90,7 @@ def test_filter_keeps_video_drops_equipment():
 class FakeResp:
     def __init__(self, payload=None, content=b""):
         self._p, self.content, self.text = payload, content, json.dumps(payload or {})
+        self.status_code = 200
     def raise_for_status(self): pass
     def json(self): return self._p
 
@@ -210,3 +211,10 @@ def test_s2b_parse_real_page():
     kept = filters.apply(items, {}, SETTINGS)
     titles = " ".join(k.title for k in kept)
     assert "냉난방기" not in titles and "영상조명 임대" not in titles and "주례여고" in titles
+
+
+def test_redact_hides_keys(monkeypatch):
+    monkeypatch.setenv("G2B_SERVICE_KEY", "abcdef1234567890")
+    msg = "HTTPError: 403 for url: https://x/y?serviceKey=abcdef1234567890&pageNo=1 (abcdef1234567890)"
+    out = cli.redact(msg)
+    assert "abcdef1234567890" not in out and "serviceKey=***" in out

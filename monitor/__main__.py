@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import re
 import shutil
 import sys
 import time
@@ -26,6 +28,18 @@ from .collectors import board
 from .db import Store
 
 ROOT = Path(__file__).resolve().parent.parent
+
+_SECRET_RE = re.compile(r"((?:serviceKey|servicekey|ServiceKey|key|token|apikey|api_key|client_secret)=)[^&\s'\"]+", re.I)
+
+
+def redact(text: str) -> str:
+    """오류 메시지에 들어간 인증키·토큰을 가린다 (대시보드는 공개되므로)."""
+    text = _SECRET_RE.sub(r"\1***", text)
+    for env in ("G2B_SERVICE_KEY", "ANTHROPIC_API_KEY", "NAVER_CLIENT_SECRET", "TELEGRAM_BOT_TOKEN", "SMTP_PASSWORD"):
+        v = os.environ.get(env)
+        if v and len(v) >= 8:
+            text = text.replace(v, "***")
+    return text
 
 
 def load_config(path: Path) -> tuple[dict, list[dict]]:
@@ -78,7 +92,7 @@ def cmd_run(args, settings, sources) -> int:
         except Exception as e:  # noqa: BLE001 — 한 사이트 실패가 전체를 막지 않도록
             prev = store.statuses().get(src["id"], {})
             status = {"ok": False, "checked": now, "found": 0, "new": 0,
-                      "error": f"{type(e).__name__}: {e}"[:300],
+                      "error": redact(f"{type(e).__name__}: {e}")[:300],
                       "last_ok": prev.get("checked") if prev.get("ok") else prev.get("last_ok", "")}
             print(f"[FAIL] {src['id']:<24} {status['error']}")
             if args.verbose:
@@ -95,7 +109,7 @@ def cmd_run(args, settings, sources) -> int:
 
     if all_new and not args.no_notify:
         for err in notify.notify(all_new, settings):
-            print(f"[알림 실패] {err}")
+            print(f"[알림 실패] {redact(err)}")
     return 0
 
 
