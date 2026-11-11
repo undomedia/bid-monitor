@@ -64,7 +64,7 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 .side { grid-row:1 / span 2; grid-column:2; display:flex; align-items:center; gap:8px; align-self:start }
 .badge { font-size:12px; font-weight:700; padding:1px 7px; border-radius:5px; border:1px solid currentColor; white-space:nowrap }
 .st-발주계획 { color:var(--plan) } .st-사전규격 { color:var(--prespec) } .st-입찰공고 { color:var(--bid) }
-.st-req { color:var(--req) } .st-학교장터 { color:var(--ok) } .st-방송사 { color:var(--prespec) }
+.st-req { color:var(--req) } .st-학교장터 { color:var(--ok) } .st-공모전 { color:var(--plan) } .st-방송사 { color:var(--prespec) }
 .new { color:var(--new); font-size:12px; font-weight:700 }
 .dday { font-size:13px; font-weight:700; white-space:nowrap }
 .money { font-size:16px; font-weight:800; white-space:nowrap; color:var(--text); letter-spacing:-.2px }
@@ -133,6 +133,7 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
     <button class="tab" data-tab="발주계획">발주계획<span class="n"></span></button>
     <button class="tab" data-tab="학교장터">학교장터<span class="n"></span></button>
     <button class="tab" data-tab="방송사 공모">방송사 공모<span class="n"></span></button>
+    <button class="tab" data-tab="공모전">공모전<span class="n"></span></button>
     <button class="tab" data-tab="req">제작 의뢰·공모<span class="n"></span></button>
     <button class="tab" data-tab="star">★ 관심<span class="n"></span></button>
   </nav>
@@ -153,7 +154,7 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 </div>
 
 <script>
-const APP_VERSION = "bd95282cd6";
+const APP_VERSION = "acdd1feb74";
 const G2B = ["발주계획", "사전규격", "입찰공고"];
 const TAB_DESC = {
   "입찰공고": "지금 입찰 가능한 공고 · 마감 지난 공고는 숨김",
@@ -161,6 +162,7 @@ const TAB_DESC = {
   "발주계획": "기관이 올해 발주할 예정인 사업 · 예산과 발주 시기를 미리 파악",
   "학교장터": "학교·교육청의 소액 견적요청 (학교 홍보영상, 행사 촬영 등) · 마감 지난 공고는 숨김",
   "방송사 공모": "방송사 외주제작·기획안 공모와 방송 제작지원 사업 (KBS·MBC·SBS·EBS·종편·YTN·콘진원 등)",
+  "공모전": "영상·UCC 분야 공모전 (공모전 모음 사이트의 실제 공고와 원문 링크) · 마감 지난 공모는 숨김",
   "req": "네이버 카페·블로그·뉴스 등에서 찾은 영상 제작 의뢰·업체 모집·공모",
   "star": "★ 표시한 공고",
 };
@@ -310,7 +312,8 @@ function isHighlight(n) {
 
 function card(n) {
   const own = isG2B(n) || n.category === "학교장터";
-  const stageCls = own ? "st-" + n.category : n.category === "방송사 공모" ? "st-방송사" : "st-req";
+  const stageCls = own ? "st-" + n.category : n.category === "방송사 공모" ? "st-방송사"
+    : n.category === "공모전" ? "st-공모전" : "st-req";
   const stageLabel = own ? n.category : n.source_name;
   const isNew = n.first_seen && n.first_seen.slice(0, 10) === latestRun.slice(0, 10);
   const meta = [
