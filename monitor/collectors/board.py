@@ -110,6 +110,8 @@ def extract(html: str, source: dict) -> list[Notice]:
             continue
         title = clean(a.get_text()) or clean(a.get("title"))
         title = re.sub(r"^(new|NEW|N)\s+|\s+(new|NEW|N)$", "", title)
+        if source.get("title_strip"):                       # 제목에 섞여 들어온 날짜·조회수 등 제거
+            title = clean(re.sub(source["title_strip"], "", title))
         if len(title) < 4:
             continue
 
@@ -120,6 +122,11 @@ def extract(html: str, source: dict) -> list[Notice]:
             dates = find_dates(row.get_text(" "))
         posted = dates[0] if dates else ""
         deadline = dates[-1] if len(dates) >= 2 and dates[-1] > posted else ""   # '게시일 ~ 마감일'
+
+        if posted and source.get("max_age_days"):         # 너무 오래된 글은 제외
+            from datetime import date, timedelta
+            if posted < (date.today() - timedelta(days=int(source["max_age_days"]))).isoformat():
+                continue
 
         url = _resolve_link(a, row, source, base_url)
         uid = url if url != base_url else f"{title}|{posted}"

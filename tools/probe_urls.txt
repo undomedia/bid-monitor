@@ -1,26 +1,19 @@
-# 방송사 외주제작·기획안 공모 게시판 후보 (사이트 점검용)
-# 지상파
-https://oiju.imbc.com/
-https://www.kbs.co.kr/
-https://www.sbs.co.kr/
-https://about.ebs.co.kr/
-https://www.ebs.co.kr/
-# 종편·보도
-https://www.tvchosun.com/
-https://jtbc.co.kr/
-https://www.ichannela.com/
-https://www.mbn.co.kr/
-https://www.yonhapnewstv.co.kr/
-https://infor.ytn.co.kr/news/bbs_list.php
-https://m.science.ytn.co.kr/community/notice_view.php?id=108&mcd=0002
-# 공공·기관
-https://www.ktv.go.kr/board/view?board_id=35&pageIndex=2&board_num=201374
-https://www.arirang.com/
-https://www.kocca.kr/kocca/bbs/list/B0000137.do
-http://www.kba.or.kr/bbs/board.php?bo_table=m02_05
-https://www.rapa.or.kr/
-# 조사로 추가된 후보
-https://www.ytn.co.kr/info/notice.php
-https://m.science.ytn.co.kr/community/notice.php?s_mcd=0002
+# 2차 점검: 목록 페이지 확인 + KBS·SBS·종편 공지 페이지 후보
+https://about.ebs.co.kr/kor/notice/announce
 https://www.ktv.go.kr/board/list?board_id=35
+https://www.yonhapnewstv.co.kr/notice
+https://www.kocca.kr/kocca/pims/list.do?menuNo=204104
+https://www.kocca.kr/kocca/bbs/list/B0000204.do?categorys=2&subcate=50&cateCode=0&menuNo=204897
 https://www.kca.kr/
+# KBS
+https://office.kbs.co.kr/
+https://www.kbs.co.kr/kbs/notice/
+# SBS
+https://www.sbs.co.kr/notice
+https://sbsmedianet.sbs.co.kr/
+# 종편
+https://broadcast.tvchosun.com/
+https://www.tvchosun.com/notice
+https://jtbc.co.kr/notice
+https://www.mbn.co.kr/pages/notice/
+https://www.ichannela.com/

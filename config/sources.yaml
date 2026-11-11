@@ -47,6 +47,53 @@ sources:
     keywords: [외주, 기획안, 제작지원, 제작 지원, 제작사, 프로그램 공모, 콘텐츠 공모]
     exclude: [시상식, 시상, 성료, 수상작, 수상, 마무리, 선정 결과, 성황, 포토, 발표, 극본, 시나리오 공모전, 채용]
 
+  # ── 방송사·기관 공모 게시판 (GitHub 서버에서 접속·인식 확인 완료) ──
+  - id: mbc_oiju
+    type: board
+    name: MBC 콘텐츠협력센터
+    category: 방송사 공모
+    url: https://oiju.imbc.com/
+    filter: all
+    exclude: [결과, 합격, 선정]
+    allow_empty: true
+  - id: ebs_announce
+    type: board
+    name: EBS 공고
+    category: 방송사 공모
+    url: https://about.ebs.co.kr/kor/notice/announce
+    keywords: &bc_kw [외주, 기획안, 제작사, 제작업체, 제작 업체, 콘텐츠 제작, 프로그램 공모, 프로그램 제작, 영상 제작, 영상제작, 다큐]
+    exclude: &bc_ex [결과, 합격, 시청자위원, 평가위원, 모니터, 미디어렙, 채용, 개인정보, 공정성 평가, 종료, 세트]
+    max_age_days: 120
+    allow_empty: true
+  - id: ytn_notice
+    type: board
+    name: YTN
+    category: 방송사 공모
+    url: https://www.ytn.co.kr/info/notice.php
+    keywords: *bc_kw
+    exclude: *bc_ex
+    max_age_days: 120
+    allow_empty: true
+  - id: ytn_science
+    type: board
+    name: YTN 사이언스
+    category: 방송사 공모
+    url: https://m.science.ytn.co.kr/community/notice.php?s_mcd=0002
+    title_strip: '\s*20\d\d-\d\d-\d\d\s*조회\s*[\d,]+\s*$'
+    keywords: *bc_kw
+    exclude: *bc_ex
+    max_age_days: 120
+    allow_empty: true
+  - id: ktv_notice
+    type: board
+    name: KTV 국민방송
+    category: 방송사 공모
+    url: https://www.ktv.go.kr/board/list?board_id=35
+    keywords: *bc_kw
+    exclude: *bc_ex
+    max_age_days: 120
+    allow_empty: true
+
   # ═══ 영역 2. 제작 의뢰·공모 (입찰 외) ═══
 
   # 네이버 카페·블로그·뉴스 검색 (NAVER_CLIENT_ID / NAVER_CLIENT_SECRET 필요)
