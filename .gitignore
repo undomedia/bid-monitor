@@ -4,3 +4,4 @@ __pycache__/
 .venv/
 .env
 probe_report.md
+probe_html/

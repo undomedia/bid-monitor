@@ -38,6 +38,11 @@ def probe(url: str) -> str:
         if not r.encoding or r.encoding.lower() == "iso-8859-1":
             r.encoding = r.apparent_encoding
         html = r.text
+        # 화면 원본도 저장 (점검 결과와 함께 내려받아 구조 확인용)
+        import hashlib
+        Path("probe_html").mkdir(exist_ok=True)
+        Path("probe_html", hashlib.md5(url.encode()).hexdigest()[:8] + ".html").write_text(
+            f"<!-- {url} -->\n" + html, encoding="utf-8")
         soup = BeautifulSoup(html, "html.parser")
         title = clean(soup.title.get_text()) if soup.title else ""
         out.append(f"- 상태 {r.status_code}, 최종주소 {r.url}, 크기 {len(html):,}, 제목 '{title}'")

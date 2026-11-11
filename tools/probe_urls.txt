@@ -1,9 +1,4 @@
-# 공모전 모음 사이트 점검 (영상/UCC 분야)
-https://www.wevity.com/
-https://www.wevity.com/?c=find&s=1&gub=1
-https://www.thinkcontest.com/
-https://www.contestkorea.com/
-https://www.contestkorea.com/sub/list.php?int_gbn=1
-https://www.all-con.co.kr/
+# 공모전: 콘테스트코리아 사진·영상·영화제 분야, 위비티 / KBS 외주공모시스템 화면 원본
+https://www.contestkorea.com/sub/list.php?int_gbn=1&Txt_bcode=031210001
+https://www.wevity.com/?c=find&s=1&gub=1&sp=title&sw=%EC%98%81%EC%83%81
 render https://op.kbs.co.kr/board/boardListMain
-# 재시도: 브라우저 부가 설치 제외

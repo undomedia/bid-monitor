@@ -29,4 +29,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: probe-report
-          path: probe_report.md
+          path: |
+            probe_report.md
+            probe_html/
