@@ -144,6 +144,7 @@ sources:
     url_contains: "Txt_bcode=031210001&str_no="
     title_strip: '^(?:\d+\.\s*)?(?:\S+•\S+\s+)*'
     detail_deadline: true
+    file_link_contains: file_dn.php
     filter: all
     exclude: [수상자, 결과, 발표, 사진공모전, 사진 공모전, 수중사진]
     allow_empty: true

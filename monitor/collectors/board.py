@@ -178,6 +178,14 @@ def collect(source: dict, lookback_days: float | None = None) -> list[Notice]:
                 if not r.encoding or r.encoding.lower() == "iso-8859-1":
                     r.encoding = r.apparent_encoding
                 n.deadline = n.deadline or detail_deadline(r.text)
+                if source.get("file_link_contains"):     # 상세 화면의 첨부파일 (공고문·서식 등)
+                    dsoup = BeautifulSoup(r.text, "html.parser")
+                    seen_f = set()
+                    for fa in dsoup.find_all("a", href=True):
+                        if source["file_link_contains"] in fa["href"] and fa["href"] not in seen_f:
+                            seen_f.add(fa["href"])
+                            n.files.append({"name": clean(fa.get_text()) or "첨부파일",
+                                            "url": urljoin(n.url, fa["href"])})
             except Exception:  # noqa: BLE001
                 pass
             time.sleep(0.3)
