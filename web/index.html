@@ -353,6 +353,10 @@ function render() {
     b.querySelector(".n").textContent = c || "";
   });
   document.getElementById("tabdesc").textContent = TAB_DESC[state.tab] || "";
+  // Safari(특히 Dock 앱)가 탭 숫자를 넣은 뒤 다시 그리지 않아 숫자가 안 보이거나 글자가 겹치는 문제 방지
+  const tabsEl = document.getElementById("tabs");
+  tabsEl.style.display = "none"; void tabsEl.offsetHeight; tabsEl.style.display = "";
+  requestAnimationFrame(() => { tabsEl.style.transform = "translateZ(0)"; requestAnimationFrame(() => { tabsEl.style.transform = ""; }); });
 
   const items = sorted(DATA.notices.filter(visible));
   document.getElementById("list").innerHTML = items.length

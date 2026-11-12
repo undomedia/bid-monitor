@@ -154,7 +154,7 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 </div>
 
 <script>
-const APP_VERSION = "518b81d022";
+const APP_VERSION = "574f02cc65";
 const G2B = ["발주계획", "사전규격", "입찰공고"];
 const TAB_DESC = {
   "입찰공고": "지금 입찰 가능한 공고 · 마감 지난 공고는 숨김",
@@ -353,6 +353,10 @@ function render() {
     b.querySelector(".n").textContent = c || "";
   });
   document.getElementById("tabdesc").textContent = TAB_DESC[state.tab] || "";
+  // Safari(특히 Dock 앱)가 탭 숫자를 넣은 뒤 다시 그리지 않아 숫자가 안 보이거나 글자가 겹치는 문제 방지
+  const tabsEl = document.getElementById("tabs");
+  tabsEl.style.display = "none"; void tabsEl.offsetHeight; tabsEl.style.display = "";
+  requestAnimationFrame(() => { tabsEl.style.transform = "translateZ(0)"; requestAnimationFrame(() => { tabsEl.style.transform = ""; }); });
 
   const items = sorted(DATA.notices.filter(visible));
   document.getElementById("list").innerHTML = items.length
