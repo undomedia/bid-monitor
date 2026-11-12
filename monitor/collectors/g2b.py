@@ -252,6 +252,16 @@ def collect(source: dict, lookback_days: float | None = None) -> list[Notice]:
     rows, max_pages = int(src.get("rows", 500)), int(src.get("max_pages", 40))
     parse = PARSERS[stage]
 
+    divs = src.get("inqry_divs") or [src.get("inqry_div", 1)]
+    notices: list[Notice] = []
+    for div in divs:
+        notices = _collect_div(src, defaults, key, base, op, start, end, rows, max_pages, parse, div)
+        if notices:
+            break
+    return notices
+
+
+def _collect_div(src, defaults, key, base, op, start, end, rows, max_pages, parse, div) -> list[Notice]:
     notices: list[Notice] = []
     # API 는 한 번에 조회 가능한 기간이 제한될 수 있어 일정 기간 단위로 나눠 조회
     chunk = timedelta(days=float(src.get("chunk_days", 7)))
@@ -262,7 +272,7 @@ def collect(source: dict, lookback_days: float | None = None) -> list[Notice]:
         while page <= max_pages:
             params = {
                 "serviceKey": key, "pageNo": page, "numOfRows": rows, "type": "json",
-                "inqryDiv": src.get("inqry_div", 1),   # 1: 등록(게시)일시 기준
+                "inqryDiv": div,                       # 1: 등록(게시)일시 기준
                 "inqryBgnDt": t.strftime("%Y%m%d%H%M"),
                 "inqryEndDt": t2.strftime("%Y%m%d%H%M"),
             }
@@ -281,7 +291,7 @@ def collect(source: dict, lookback_days: float | None = None) -> list[Notice]:
             items, total = _items(payload)
             if page == 1 and t == start:
                 # 실행 기록용: 원본 건수와 항목 이름(값은 기록하지 않음)
-                print(f"    [{defaults['category']}] 원본 {total}건, 항목: {sorted(items[0].keys())[:40] if items else '-'}")
+                print(f"    [{defaults['category']}] 조회기준 {div}: 원본 {total}건, 항목: {sorted(items[0].keys())[:40] if items else '-'}")
             notices.extend(parse(it, src) for it in items)
             if page * rows >= total or not items:
                 break

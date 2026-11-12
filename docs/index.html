@@ -154,7 +154,7 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 </div>
 
 <script>
-const APP_VERSION = "acdd1feb74";
+const APP_VERSION = "518b81d022";
 const G2B = ["발주계획", "사전규격", "입찰공고"];
 const TAB_DESC = {
   "입찰공고": "지금 입찰 가능한 공고 · 마감 지난 공고는 숨김",
@@ -381,24 +381,35 @@ document.getElementById("list").addEventListener("click", e => {
   if (h) { const id = h.dataset.hide; hidden.has(id) ? hidden.delete(id) : hidden.add(id); store.set("hidden", [...hidden]); render(); }
 });
 
-fetch("data.json", { cache: "no-store" })
-  .then(r => r.json())
-  .then(d => {
-    // 화면이 새로 바뀌었는데 예전 화면을 보고 있으면 새 화면으로 다시 열기 (한 번만)
-    if (d.app_version && d.app_version !== APP_VERSION && !location.search.includes("v=" + d.app_version)) {
-      location.replace(location.pathname + "?v=" + d.app_version);
-      return;
-    }
-    DATA = d;
-    d.notices.forEach(n => {
-      if (n.category === "사전규격") specByNo[n.uid] = n;
-      if (n.category === "입찰공고" && n.info && n.info["사전규격번호"]) bidBySpec[n.info["사전규격번호"]] = n;
-    });
-    latestRun = d.notices.reduce((m, n) => n.first_seen > m ? n.first_seen : m, "");
-    document.getElementById("updated").textContent = "업데이트 " + d.generated;
-    renderAlerts(); render();
-  })
-  .catch(() => { document.getElementById("list").innerHTML = '<div class="empty">data.json 을 불러오지 못했습니다</div>'; });
+let lastLoad = 0;
+function load() {
+  lastLoad = Date.now();
+  return fetch("data.json?t=" + Date.now(), { cache: "no-store" })
+    .then(r => r.json())
+    .then(d => {
+      // 화면이 새로 바뀌었는데 예전 화면을 보고 있으면 새 화면으로 다시 열기 (한 번만)
+      if (d.app_version && d.app_version !== APP_VERSION && !location.search.includes("v=" + d.app_version)) {
+        location.replace(location.pathname + "?v=" + d.app_version);
+        return;
+      }
+      DATA = d;
+      bidBySpec = {}; specByNo = {};
+      d.notices.forEach(n => {
+        if (n.category === "사전규격") specByNo[n.uid] = n;
+        if (n.category === "입찰공고" && n.info && n.info["사전규격번호"]) bidBySpec[n.info["사전규격번호"]] = n;
+      });
+      latestRun = d.notices.reduce((m, n) => n.first_seen > m ? n.first_seen : m, "");
+      document.getElementById("updated").textContent = "업데이트 " + d.generated;
+      renderAlerts(); render();
+    })
+    .catch(() => { document.getElementById("list").innerHTML = '<div class="empty">data.json 을 불러오지 못했습니다</div>'; });
+}
+load();
+// Safari 앱이 예전 화면을 복원했거나, 앱으로 다시 돌아왔을 때(5분 이상 지난 경우) 최신 데이터로 다시 그리기
+window.addEventListener("pageshow", e => { if (e.persisted) load(); });
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && Date.now() - lastLoad > 5 * 60 * 1000) load();
+});
 </script>
 </body>
 </html>

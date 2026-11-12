@@ -36,11 +36,19 @@ def fetch_html(source: dict) -> str:
             browser.close()
             return html
 
-    r = session().request(
-        source.get("method", "GET").upper(), url,
-        params=source.get("params"), data=source.get("data"),
-        headers=source.get("headers"), timeout=30,
-    )
+    import time
+    for attempt in range(3):                       # 가끔 연결이 끊기는 사이트가 있어 최대 3번 시도
+        try:
+            r = session().request(
+                source.get("method", "GET").upper(), url,
+                params=source.get("params"), data=source.get("data"),
+                headers=source.get("headers"), timeout=30,
+            )
+            break
+        except Exception:  # noqa: BLE001
+            if attempt == 2:
+                raise
+            time.sleep(3)
     r.raise_for_status()
     if source.get("encoding"):
         r.encoding = source["encoding"]

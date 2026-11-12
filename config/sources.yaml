@@ -9,7 +9,8 @@ sources:
     type: g2b
     name: 나라장터 발주계획
     stage: plan          # 발주계획
-    lookback_days: 7
+    lookback_days: 30    # 발주계획은 연초에 몰려 올라와서 넉넉히 조회
+    inqry_divs: [1, 2]   # 조회 기준: 1(등록일)로 0건이면 2로 다시 시도
 
   - id: g2b_prespec
     type: g2b
