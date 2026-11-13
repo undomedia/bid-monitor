@@ -35,6 +35,17 @@ sources:
   #   category: 입찰공고
   #   url: https://apis.data.go.kr/(End Point)/(기능이름)
 
+  - id: nuri_bid
+    type: g2b
+    stage: bid
+    name: 누리장터
+    category: 입찰공고
+    base_url: https://apis.data.go.kr/1230000/ao/PrvtBidNtceService    # 누리장터 민간입찰공고
+    operation: getPrvtBidPblancListInfoServc                             # 용역조회
+    lookback_days: 3
+    rows: 100
+    chunk_days: 1
+
   - id: kra_bid
     type: datagokr
     name: 한국마사회
