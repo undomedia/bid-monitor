@@ -80,6 +80,7 @@ sources:
 
   # ── 방송사·기관 공모 게시판 (GitHub 서버에서 접속·인식 확인 완료) ──
   - id: mbc_oiju
+    detail_deadline: true      # 본문에서 접수 마감일 읽기
     type: board
     name: MBC 콘텐츠협력센터
     category: 방송사 공모
@@ -88,6 +89,7 @@ sources:
     exclude: [결과, 합격, 선정]
     allow_empty: true
   - id: ebs_announce
+    detail_deadline: true      # 본문에서 접수 마감일 읽기
     type: board
     name: EBS 공고
     category: 방송사 공모
@@ -100,6 +102,7 @@ sources:
     max_age_days: 120
     allow_empty: true
   - id: ytn_notice
+    detail_deadline: true      # 본문에서 접수 마감일 읽기
     type: board
     name: YTN
     category: 방송사 공모
@@ -109,6 +112,7 @@ sources:
     max_age_days: 120
     allow_empty: true
   - id: ytn_science
+    detail_deadline: true      # 본문에서 접수 마감일 읽기
     type: board
     name: YTN 사이언스
     category: 방송사 공모
@@ -119,6 +123,7 @@ sources:
     max_age_days: 120
     allow_empty: true
   - id: ktv_notice
+    detail_deadline: true      # 본문에서 접수 마감일 읽기
     type: board
     name: KTV 국민방송
     category: 방송사 공모
@@ -128,6 +133,7 @@ sources:
     max_age_days: 120
     allow_empty: true
   - id: kbs_oeju
+    detail_deadline: true      # 본문에서 접수 마감일 읽기
     type: board
     name: KBS 외주제작
     category: 방송사 공모
@@ -137,6 +143,7 @@ sources:
     max_age_days: 120
     allow_empty: true
   - id: yonhap_notice
+    detail_deadline: true      # 본문에서 접수 마감일 읽기
     type: board
     name: 연합뉴스TV
     category: 방송사 공모
@@ -146,6 +153,7 @@ sources:
     max_age_days: 120
     allow_empty: true
   - id: kocca_support
+    detail_deadline: true      # 본문에서 접수 마감일 읽기
     type: board
     name: 한국콘텐츠진흥원
     category: 방송사 공모
@@ -155,6 +163,7 @@ sources:
     max_age_days: 120
     allow_empty: true
   - id: kca_notice
+    detail_deadline: true      # 본문에서 접수 마감일 읽기
     type: board
     name: 방송통신전파진흥원
     category: 방송사 공모

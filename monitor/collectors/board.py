@@ -159,18 +159,42 @@ def extract(html: str, source: dict) -> list[Notice]:
     return out
 
 
-_DEADLINE_WORDS = ("접수기간", "접수 기간", "공모기간", "응모기간", "모집기간", "접수마감", "마감일", "접수일정")
+# 본문에서 마감일을 찾을 때 볼 표현 (앞에 있을수록 우선: 제안서 접수 마감을 공고 기간보다 먼저)
+_DEADLINE_WORDS = ("제안서 제출", "제안서 접수", "제안서제출", "기획안 제출", "기획안 접수", "제출기간", "제출 기간",
+                   "접수기간", "접수 기간", "신청기간", "신청 기간", "공모기간", "응모기간", "모집기간",
+                   "접수마감", "제출마감", "접수 마감", "제출 마감", "마감일", "마감일시", "접수일정", "접수 일정")
+_MD = re.compile(r"~\s*(?:(20\d{2}|\d{2})\s*[.\-/년]\s*)?(\d{1,2})\s*[.\-/월]\s*(\d{1,2})\s*일?\.?")
+_TIME = re.compile(r"(\d{1,2})\s*[:시]\s*(\d{2})?")
 
 
 def detail_deadline(html: str) -> str:
-    """상세 화면 글에서 '접수기간 2026.11.01 ~ 2026.12.15' 같은 부분을 찾아 마감일을 돌려준다."""
-    text = BeautifulSoup(html, "html.parser").get_text(" ")
+    """상세 화면 글에서 '접수기간 2026. 11. 6.(목) ~ 11. 20.(목) 18:00' 같은 부분을 찾아 마감일(시각)을 돌려준다.
+    끝 날짜에 연도가 빠진 경우 앞 날짜의 연도를 쓴다."""
+    from datetime import date
+    text = re.sub(r"\s+", " ", BeautifulSoup(html, "html.parser").get_text(" "))
     for w in _DEADLINE_WORDS:
         i = text.find(w)
-        if i >= 0:
-            dates = find_dates(text[i:i + 80])
-            if dates:
-                return max(dates)
+        if i < 0:
+            continue
+        window = text[i:i + 140]
+        dates = find_dates(window)
+        if not dates:
+            continue
+        m = _MD.search(window)
+        if m:
+            year = int(m.group(1)) if m.group(1) else int(dates[0][:4])
+            year = year + 2000 if year < 100 else year
+            try:
+                end = date(year, int(m.group(2)), int(m.group(3))).isoformat()
+            except ValueError:
+                end = max(dates)
+            if end < dates[0]:                 # 12월 → 1월처럼 해를 넘기는 경우
+                end = date(year + 1, int(m.group(2)), int(m.group(3))).isoformat()
+            t = _TIME.search(window[m.end():m.end() + 25])
+            if t and int(t.group(1)) < 24:
+                return f"{end} {int(t.group(1)):02d}:{int(t.group(2) or 0):02d}"
+            return end
+        return max(dates)
     return ""
 
 

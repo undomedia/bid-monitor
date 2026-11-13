@@ -154,7 +154,7 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 </div>
 
 <script>
-const APP_VERSION = "de16a7697b";
+const APP_VERSION = "8ba05e4c47";
 const G2B = ["발주계획", "사전규격", "입찰공고"];
 const TAB_DESC = {
   "입찰공고": "지금 입찰 가능한 공고 · 마감 지난 공고는 숨김",
@@ -321,7 +321,7 @@ function card(n) {
   const meta = [
     n.org && `<span>${esc(n.org)}</span>`,
     n.posted && `<span>게시 ${esc(n.posted)}</span>`,
-    n.deadline && `<span>마감 ${esc(n.deadline)}</span>`,
+    n.deadline && `<span>${["방송사 공모", "공모전"].includes(n.category) ? "접수 마감" : "마감"} ${esc(n.deadline)}</span>`,
     (isG2B(n) || n.category === "학교장터") && n.kind && `<span>${esc(n.kind)}</span>`,
     n.analysis && n.analysis.ok && n.analysis.period && `<span class="badge-ai">기간 ${esc(n.analysis.period)}</span>`,
     n.analysis && n.analysis.ok && n.analysis.tech_price_ratio && `<span class="badge-ai">기술:가격 ${esc(n.analysis.tech_price_ratio)}</span>`,

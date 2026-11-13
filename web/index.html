@@ -321,7 +321,7 @@ function card(n) {
   const meta = [
     n.org && `<span>${esc(n.org)}</span>`,
     n.posted && `<span>게시 ${esc(n.posted)}</span>`,
-    n.deadline && `<span>마감 ${esc(n.deadline)}</span>`,
+    n.deadline && `<span>${["방송사 공모", "공모전"].includes(n.category) ? "접수 마감" : "마감"} ${esc(n.deadline)}</span>`,
     (isG2B(n) || n.category === "학교장터") && n.kind && `<span>${esc(n.kind)}</span>`,
     n.analysis && n.analysis.ok && n.analysis.period && `<span class="badge-ai">기간 ${esc(n.analysis.period)}</span>`,
     n.analysis && n.analysis.ok && n.analysis.tech_price_ratio && `<span class="badge-ai">기술:가격 ${esc(n.analysis.tech_price_ratio)}</span>`,
