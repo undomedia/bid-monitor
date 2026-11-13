@@ -24,6 +24,15 @@ sources:
     stage: bid           # 입찰공고
     lookback_days: 3
 
+  # ═══ 기관별 입찰공고 API (입찰공고 탭에 함께 표시) ═══
+  # 공공데이터포털 활용신청 화면의 End Point 뒤에 '/기능이름'을 붙여 url 에 넣으면 된다. 키는 나라장터와 같은 것.
+  # 예)
+  # - id: kwater_bid
+  #   type: datagokr
+  #   name: 수자원공사
+  #   category: 입찰공고
+  #   url: https://apis.data.go.kr/(End Point)/(기능이름)
+
   # ═══ 학교장터 (학교·교육청 소액 견적요청) — 키 필요 없음 ═══
   - id: s2b
     type: s2b

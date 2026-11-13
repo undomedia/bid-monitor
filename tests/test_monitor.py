@@ -266,3 +266,22 @@ def test_board_link_mode_and_detail_deadline():
     items = board.extract(html, src)
     assert [n.title for n in items] == ["광명역 AI 영상 공모전"]
     assert board.detail_deadline("<p>접수기간 : 2026.11.01 ~ 2026.12.15</p>") == "2026-12-15"
+
+
+def test_datagokr_generic_collector(monkeypatch):
+    from monitor.collectors import datagokr
+    payload = api([{"bidNo": "K-1", "bidNm": "물관리 홍보영상 제작 용역", "insttNm": "한국수자원공사",
+                    "regDt": "2026-11-12 10:00:00", "bidEndDt": "2026-11-20 18:00:00", "presmptPrce": "30000000"}])
+    calls = []
+
+    class S:
+        def get(self, url, params=None, timeout=None):
+            calls.append(params)
+            return FakeResp(payload)
+    monkeypatch.setattr("monitor.collectors.datagokr.session", lambda: S())
+    monkeypatch.setenv("G2B_SERVICE_KEY", "k")
+    src = {"id": "kwater_bid", "type": "datagokr", "name": "수자원공사", "url": "https://x/getBid",
+           "date_params": {"start": "bgnDt", "end": "endDt"}}
+    n = datagokr.collect(src, 30)[0]
+    assert (n.title, n.org, n.uid, n.amount, n.category) == ("물관리 홍보영상 제작 용역", "한국수자원공사", "K-1", 30_000_000, "입찰공고")
+    assert n.deadline == "2026-11-20 18:00" and "bgnDt" in calls[0]
