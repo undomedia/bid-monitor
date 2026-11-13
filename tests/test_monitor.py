@@ -352,3 +352,20 @@ def test_missing_key_is_skipped_not_failed(tmp_path, monkeypatch):
 def test_g2b_response_error_is_reported():
     with pytest.raises(RuntimeError, match="범위"):
         g2b._items({"nkoneps.com.response.ResponseError": {"header": {"resultCode": "07", "resultMsg": "입력범위값 초과 에러"}}})
+
+
+def test_datagokr_month_param_and_key_name(monkeypatch):
+    from monitor.collectors import datagokr
+    calls = []
+
+    class S:
+        def get(self, url, params=None, timeout=None):
+            calls.append(dict(params))
+            return FakeResp(api([]))
+    monkeypatch.setattr("monitor.collectors.datagokr.session", lambda: S())
+    monkeypatch.setenv("G2B_SERVICE_KEY", "k")
+    datagokr.collect({"id": "kra_bid", "name": "마사회", "url": "https://x", "key_param": "ServiceKey",
+                      "month_param": "notice_month"}, 40)
+    months = [c["notice_month"] for c in calls]
+    assert len(months) >= 2 and months == sorted(months) and all(len(m) == 6 for m in months)
+    assert calls[0]["ServiceKey"] == "k" and "serviceKey" not in calls[0]

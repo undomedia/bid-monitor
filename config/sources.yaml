@@ -51,6 +51,8 @@ sources:
     name: 한국마사회
     category: 입찰공고
     url: https://apis.data.go.kr/B551015/API182/E-noticeInfo      # 전자입찰 공고정보
+    key_param: ServiceKey     # 마사회는 인증키 항목 이름이 대문자로 시작
+    month_param: notice_month # 공고월(YYYYMM)로 조회
     lookback_days: 14
 
   - id: kwater_bid
@@ -58,6 +60,7 @@ sources:
     name: 수자원공사
     category: 입찰공고
     url: https://apis.data.go.kr/B500001/ebid/tndr3/servcList     # 용역 입찰공고 (영상제작은 용역)
+    month_param: searchDt     # 검색년월(YYYYMM) 필수
     lookback_days: 14
 
   - id: kepco_bid

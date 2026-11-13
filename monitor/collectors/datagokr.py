@@ -78,7 +78,8 @@ def collect(source: dict, lookback_days: float | None = None) -> list[Notice]:
     days = lookback_days if lookback_days is not None else float(source.get("lookback_days", 7))
     end = datetime.now()
     start = end - timedelta(days=days)
-    params = {"serviceKey": key, "type": "json", "_type": "json", "pageNo": 1, "numOfRows": 100}
+    params = {source.get("key_param", "serviceKey"): key, "type": "json", "_type": "json",
+              "pageNo": 1, "numOfRows": 100}
     params.update(source.get("params") or {})
     dp = source.get("date_params")
     if dp:
@@ -86,6 +87,24 @@ def collect(source: dict, lookback_days: float | None = None) -> list[Notice]:
         params[dp["start"]] = start.strftime(fmt)
         params[dp["end"]] = end.strftime(fmt)
 
+    # 년월(YYYYMM)로만 검색하는 API(수자원공사 searchDt, 마사회 notice_month): 조회 기간에 걸친 달마다 요청
+    month_param = source.get("month_param")
+    months = [None]
+    if month_param:
+        months, m = [], datetime(start.year, start.month, 1)
+        while m <= end:
+            months.append(m.strftime("%Y%m"))
+            m = datetime(m.year + (m.month == 12), m.month % 12 + 1, 1)
+
+    out: list[Notice] = []
+    for month in months:
+        if month:
+            params[month_param] = month
+        out.extend(_collect_pages(source, params, start))
+    return out
+
+
+def _collect_pages(source: dict, params: dict, start: datetime) -> list[Notice]:
     out: list[Notice] = []
     for page in range(1, int(source.get("max_pages", 10)) + 1):
         params["pageNo"] = page
@@ -103,7 +122,8 @@ def collect(source: dict, lookback_days: float | None = None) -> list[Notice]:
         payload = _payload(r)
         items, total = _items(payload)          # 키 오류 등은 여기서 안내 문구와 함께 알려줌
         if page == 1:
-            print(f"    [{source.get('name')}] 원본 {total}건, 항목: {sorted(items[0].keys())[:40] if items else '-'}")
+            mp = source.get("month_param")
+            print(f"    [{source.get('name')}]{' ' + str(params.get(mp)) if mp else ''} 원본 {total}건, 항목: {sorted(items[0].keys())[:40] if items else '-'}")
             if not items:
                 print(f"      응답 구조: {shape(payload)[:600]}")
         for it in items:
