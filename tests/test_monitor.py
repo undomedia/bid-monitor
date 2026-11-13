@@ -336,3 +336,14 @@ def test_kepco_collector(monkeypatch):
     assert n.source_name == "한국남부발전" and n.amount == 50_000_000 and n.kind == "용역"
     assert n.info["계약방법"] == "제한경쟁" and n.info["낙찰방법"] == "협상에 의한 계약"
     assert n.files == [{"name": "제안요청서.hwp", "url": "https://srm.kepco.net/f/1"}]
+
+
+def test_missing_key_is_skipped_not_failed(tmp_path, monkeypatch):
+    monkeypatch.delenv("NAVER_CLIENT_ID", raising=False)
+    monkeypatch.setattr(cli, "ROOT", tmp_path)
+    (tmp_path / "web").mkdir()
+    (tmp_path / "web" / "index.html").write_text("x")
+    args = type("A", (), {"only": None, "days": None, "no_notify": True, "no_analyze": True, "verbose": False})()
+    cli.cmd_run(args, {"db_path": "x.db"}, [{"id": "naver_requests", "type": "naver", "queries": ["a"]}])
+    st = Store(tmp_path / "x.db").statuses()["naver_requests"]
+    assert st["ok"] is True and st["skipped"] is True

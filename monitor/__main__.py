@@ -123,7 +123,12 @@ def cmd_run(args, settings, sources) -> int:
             status = {"ok": False, "checked": now, "found": 0, "new": 0,
                       "error": redact(f"{type(e).__name__}: {e}")[:300],
                       "last_ok": prev.get("checked") if prev.get("ok") else prev.get("last_ok", "")}
-            print(f"[FAIL] {src['id']:<24} {status['error']}")
+            if "환경변수" in str(e) and "없습니다" in str(e):
+                # 키를 아직 넣지 않은 출처는 실패가 아니라 '설정 전' (대시보드 경고에서 제외)
+                status.update(ok=True, skipped=True, error="", note="인증키를 아직 넣지 않아 수집하지 않음")
+                print(f"[SKIP] {src['id']:<24} 인증키 없음 (설정 전)")
+            else:
+                print(f"[FAIL] {src['id']:<24} {status['error']}")
             if args.verbose:
                 traceback.print_exc()
         if status["ok"]:
