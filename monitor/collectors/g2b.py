@@ -309,6 +309,11 @@ def _collect_div(src, defaults, key, base, op, start, end, rows, max_pages, pars
                 "inqryBgnDt": t.strftime("%Y%m%d%H%M"),
                 "inqryEndDt": t2.strftime("%Y%m%d%H%M"),
             }
+            if src.get("stage") == "plan":
+                # 발주계획: 조회구분·발주년월범위·게시일자범위로 검색 → 발주년월(이번 달~N개월 뒤)도 함께 보냄
+                params["orderBgnYm"] = end.strftime("%Y%m")
+                ahead = end + timedelta(days=31 * int(src.get("months_ahead", 6)))
+                params["orderEndYm"] = ahead.strftime("%Y%m")
             r = session().get(f"{base}/{op}", params=params, timeout=40)
             if r.status_code >= 400:
                 hint = {403: " — 이 API의 활용신청이 안 되었거나 아직 승인 전입니다 (공공데이터포털 마이페이지 확인)",
