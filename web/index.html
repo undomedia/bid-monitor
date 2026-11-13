@@ -50,7 +50,10 @@ input[type=search], select { font:inherit; font-size:14px; padding:7px 10px; bor
 input[type=search] { flex:1; min-width:160px }
 label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; gap:4px; cursor:pointer }
 .alert { background:var(--warn-bg); color:var(--warn); border-radius:8px; padding:8px 12px; font-size:13px; margin:8px 0 }
-.alert summary { cursor:pointer }
+.alert summary { cursor:pointer; font-weight:600 }
+.errbox { margin:8px 0; padding:8px 10px; background:rgba(255,255,255,.5); border-radius:6px; line-height:1.6 }
+.errsub { font-size:12px; opacity:.85 }
+.errbox code { white-space:pre-wrap; word-break:break-all }
 .list { display:flex; flex-direction:column; gap:8px }
 .item { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 14px;
   display:grid; grid-template-columns:1fr auto; gap:4px 12px }
@@ -368,11 +371,25 @@ function render() {
     : `<div class="empty">${state.tab === "star" ? "★ 를 눌러 관심 공고를 모아보세요" : "조건에 맞는 공고가 없습니다"}</div>`;
 }
 
+function errHelp(e) {
+  e = e || "";
+  if (/50[234]|시간 초과|Timeout|timed out/i.test(e)) return "기관 서버가 응답하지 않았습니다. 기관 쪽의 일시적인 문제인 경우가 많아, 보통 다음 수집 때 저절로 해결됩니다.";
+  if (/403|활용신청|승인/.test(e)) return "공공데이터포털에서 이 API의 사용 승인이 아직 안 되었거나 신청이 빠졌습니다.";
+  if (/401|인증키|SERVICE_KEY|SERVICE KEY|키/.test(e)) return "인증키가 맞지 않거나 아직 등록되지 않았습니다.";
+  if (/404/.test(e)) return "기관이 주소를 바꾸었거나 게시판이 없어졌습니다. 수집 설정을 고쳐야 합니다.";
+  if (/Connection|연결|resolve|SSL/i.test(e)) return "사이트에 접속하지 못했습니다. 사이트가 잠시 멈췄을 수 있습니다.";
+  return "예상하지 못한 오류입니다. 계속되면 Claude에게 이 내용을 그대로 보여주세요.";
+}
+
 function renderAlerts() {
   const bad = DATA.sources.filter(s => s.ok === false && !s.skipped);
   if (!bad.length) { document.getElementById("alerts").innerHTML = ""; return; }
-  document.getElementById("alerts").innerHTML = `<details class="alert"><summary>⚠ 수집 실패 ${bad.length}곳 — 이 출처의 새 공고가 빠졌을 수 있습니다</summary>
-    ${bad.map(s => `<div>· <b>${esc(s.name)}</b>: ${esc(s.error)}${s.last_ok ? ` (마지막 성공 ${esc(s.last_ok)})` : ""}</div>`).join("")}</details>`;
+  document.getElementById("alerts").innerHTML = `<details class="alert"><summary>⚠ 수집 실패 ${bad.length}곳 (${bad.map(s => esc(s.name)).join(", ")}) — 눌러서 자세히 보기</summary>
+    ${bad.map(s => `<div class="errbox"><b>${esc(s.name)}</b>
+      <div>무슨 일인가요? ${esc(errHelp(s.error))}</div>
+      <div class="errsub">마지막 시도 ${esc(s.checked || "-")} · 마지막 성공 ${esc(s.last_ok || "아직 없음")}</div>
+      <div class="errsub">오류 기록: <code>${esc(s.error)}</code></div></div>`).join("")}
+    <div class="errsub">실패한 곳 외의 공고는 정상적으로 모였습니다.</div></details>`;
 }
 
 document.getElementById("tabs").addEventListener("click", e => {

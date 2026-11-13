@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import os
 import re
+import time
 from datetime import datetime, timedelta
 from urllib.parse import unquote
 
@@ -109,13 +110,16 @@ def _collect_pages(source: dict, params: dict, start: datetime) -> list[Notice]:
     for page in range(1, int(source.get("max_pages", 10)) + 1):
         params["pageNo"] = page
         r = None
-        for attempt in range(2):                # 응답이 느린 기관(마사회 등)은 넉넉히 기다리고 한 번 더 시도
+        tries = int(source.get("retries", 3))
+        for attempt in range(tries):            # 응답이 느리거나 일시적으로 멈춘 기관(마사회 등)은 쉬었다가 다시 시도
             try:
                 r = session().get(source["url"], params=params, timeout=int(source.get("timeout", 90)))
-                break
+                if r.status_code < 500 or attempt == tries - 1:
+                    break
             except Exception:  # noqa: BLE001
-                if attempt == 1:
+                if attempt == tries - 1:
                     raise
+            time.sleep(15 * (attempt + 1))
         if r.status_code >= 400 and not r.text.lstrip().startswith("<"):
             hint = {403: " — 이 API의 활용신청이 안 되었거나 아직 승인 전입니다"}.get(r.status_code, "")
             raise RuntimeError(f"{source.get('name', '')} API 응답 오류 {r.status_code}{hint}")
