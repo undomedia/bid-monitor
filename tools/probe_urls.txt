@@ -1,3 +1,4 @@
-# 콘테스트코리아 상세(마감일 인식 확인) / KBS 외주공모시스템 화면 글 구조
-https://www.contestkorea.com/sub/view.php?int_gbn=1&Txt_bcode=031210001&str_no=202611090051
-render https://op.kbs.co.kr/board/boardListMain
+# 한국전력 SRM 전자입찰시스템 점검
+https://srm.kepco.net/
+https://srm.kepco.net/index.do
+render https://srm.kepco.net/
