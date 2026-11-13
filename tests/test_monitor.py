@@ -285,3 +285,31 @@ def test_datagokr_generic_collector(monkeypatch):
     n = datagokr.collect(src, 30)[0]
     assert (n.title, n.org, n.uid, n.amount, n.category) == ("물관리 홍보영상 제작 용역", "한국수자원공사", "K-1", 30_000_000, "입찰공고")
     assert n.deadline == "2026-11-20 18:00" and "bgnDt" in calls[0]
+
+
+def test_datagokr_xml_response(monkeypatch):
+    from monitor.collectors import datagokr
+    xml = """<?xml version="1.0" encoding="UTF-8"?><response><header><resultCode>00</resultCode></header>
+    <body><items><item><bidNm>경마 홍보영상 제작</bidNm><bidNo>KRA-7</bidNo><regDt>20261112</regDt></item></items>
+    <totalCount>1</totalCount></body></response>"""
+    err = """<?xml version="1.0"?><OpenAPI_ServiceResponse><cmmMsgHeader><errMsg>SERVICE_KEY_IS_NOT_REGISTERED_ERROR</errMsg>
+    <returnAuthMsg>등록되지 않은 서비스키</returnAuthMsg><returnReasonCode>30</returnReasonCode></cmmMsgHeader></OpenAPI_ServiceResponse>"""
+    resp = {"t": xml}
+
+    class R:
+        status_code = 200
+        @property
+        def text(self): return resp["t"]
+    monkeypatch.setattr("monitor.collectors.datagokr.session", lambda: type("S", (), {"get": lambda *a, **k: R()})())
+    monkeypatch.setenv("G2B_SERVICE_KEY", "k")
+    n = datagokr.collect({"id": "kra_bid", "name": "한국마사회", "url": "https://x"}, 30)[0]
+    assert n.title == "경마 홍보영상 제작" and n.uid == "KRA-7" and n.posted == "2026-11-12"
+    resp["t"] = err
+    with pytest.raises(RuntimeError, match="활용신청"):
+        datagokr.collect({"id": "kra_bid", "name": "한국마사회", "url": "https://x"}, 30)
+
+
+def test_fmt_dt_digit_dates():
+    assert g2b._fmt_dt("20261112") == "2026-11-12"
+    assert g2b._fmt_dt("202611121030") == "2026-11-12 10:30"
+    assert g2b._fmt_dt("2026-11-12 10:30:00") == "2026-11-12 10:30"

@@ -61,10 +61,19 @@ def _fmt_dt(v: str) -> str:
     v = (v or "").strip()
     if not v:
         return ""
+    if v.isdigit():                       # 숫자만 붙은 날짜는 자릿수로 구분 (20261112 를 1월 1일로 읽는 실수 방지)
+        fmt, out = {8: ("%Y%m%d", "%Y-%m-%d"), 12: ("%Y%m%d%H%M", "%Y-%m-%d %H:%M"),
+                    14: ("%Y%m%d%H%M%S", "%Y-%m-%d %H:%M")}.get(len(v), (None, None))
+        if fmt:
+            try:
+                return datetime.strptime(v, fmt).strftime(out)
+            except ValueError:
+                return v
+        return v
     for fmt, out in (("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M"), ("%Y-%m-%d %H:%M", "%Y-%m-%d %H:%M"),
-                     ("%Y%m%d%H%M%S", "%Y-%m-%d %H:%M"), ("%Y%m%d%H%M", "%Y-%m-%d %H:%M"),
-                     ("%Y/%m/%d %H:%M:%S", "%Y-%m-%d %H:%M"), ("%Y-%m-%d", "%Y-%m-%d"),
-                     ("%Y%m%d", "%Y-%m-%d")):
+                     ("%Y/%m/%d %H:%M:%S", "%Y-%m-%d %H:%M"), ("%Y/%m/%d %H:%M", "%Y-%m-%d %H:%M"),
+                     ("%Y.%m.%d %H:%M", "%Y-%m-%d %H:%M"), ("%Y-%m-%d", "%Y-%m-%d"), ("%Y.%m.%d", "%Y-%m-%d"),
+                     ("%Y/%m/%d", "%Y-%m-%d")):
         try:
             return datetime.strptime(v, fmt).strftime(out)
         except ValueError:

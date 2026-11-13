@@ -1,4 +1,2 @@
-# 한국전력 SRM 전자입찰시스템 점검
-https://srm.kepco.net/
-https://srm.kepco.net/index.do
-render https://srm.kepco.net/
+# 한국전력 입찰정보 API 안내 페이지 (End Point·기능 이름 확인)
+https://www.data.go.kr/data/15148223/openapi.do

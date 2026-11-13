@@ -33,6 +33,20 @@ sources:
   #   category: 입찰공고
   #   url: https://apis.data.go.kr/(End Point)/(기능이름)
 
+  - id: kra_bid
+    type: datagokr
+    name: 한국마사회
+    category: 입찰공고
+    url: https://apis.data.go.kr/B551015/API182/E-noticeInfo      # 전자입찰 공고정보
+    lookback_days: 14
+
+  - id: kwater_bid
+    type: datagokr
+    name: 수자원공사
+    category: 입찰공고
+    url: https://apis.data.go.kr/B500001/ebid/tndr3/servcList     # 용역 입찰공고 (영상제작은 용역)
+    lookback_days: 14
+
   # ═══ 학교장터 (학교·교육청 소액 견적요청) — 키 필요 없음 ═══
   - id: s2b
     type: s2b

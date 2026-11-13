@@ -52,7 +52,7 @@ def probe(url: str) -> str:
 
     # 화면 글 중 공고처럼 보이는 줄 (게시글이 링크가 아닌 사이트 구조 확인용)
     lines = [clean(x) for x in soup.get_text("\n").split("\n")]
-    hits = [x for x in lines if x and len(x) < 120 and re.search(r"공모|공고|모집|20\d\d[.-]", x)]
+    hits = [x for x in lines if x and len(x) < 160 and re.search(r"공모|공고|모집|20\d\d[.-]|End Point|apis\.data\.go\.kr|^/[A-Za-z-]+$|상세기능|입찰", x)]
     if hits:
         out.append(f"- 화면 글 중 공고 후보 {len(hits)}줄")
         out.extend(f"    · {x}" for x in hits[:30])
