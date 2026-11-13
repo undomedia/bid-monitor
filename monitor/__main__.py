@@ -110,7 +110,13 @@ def cmd_run(args, settings, sources) -> int:
         t0 = time.time()
         first_run = not store.has_source(src["id"])
         try:
-            items = filters.apply(fn(src, args.days), src, settings)
+            raw = fn(src, args.days)
+            # 조건에 맞지 않는 공고(예: 학교장터 공급업체 지정)는 빼고, 이미 저장돼 있으면 지움
+            dropped = [n.id for n in raw if n.exclude_reason]
+            if dropped:
+                store.delete(dropped)
+                print(f"       {len(dropped)}건 제외 ({raw[0].source_name}: 공급업체 지정·지역 제한 등)")
+            items = filters.apply([n for n in raw if not n.exclude_reason], src, settings)
             if src.get("attachments"):            # 첨부파일이 별도 기능인 API(나라장터 02): 걸러진 공고만 추가 조회
                 from .collectors.g2b import fetch_attachments
                 for n in items:

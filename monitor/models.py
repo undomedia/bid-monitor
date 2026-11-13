@@ -21,6 +21,7 @@ class Notice:
     files: list[dict] = field(default_factory=list)    # 첨부서류 [{"name":..., "url":...}]
     info: dict = field(default_factory=dict)           # 한눈에 보기 항목 {"계약방법": "...", ...}
     matched: list[str] = field(default_factory=list)   # 매칭된 관심 키워드
+    exclude_reason: str = ""  # 이 사유가 있으면 대시보드에 올리지 않음 (예: 학교장터 공급업체 지정)
     first_seen: str = ""    # 처음 수집된 시각
 
     @property
@@ -32,4 +33,5 @@ class Notice:
     def to_dict(self) -> dict:
         d = asdict(self)
         d["id"] = self.id
+        d.pop("exclude_reason", None)
         return d

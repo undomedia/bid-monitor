@@ -390,3 +390,17 @@ def test_fetch_attachments_02(monkeypatch):
     assert seen["inqryDiv"] == 2 and seen["bidNtceNo"] == "R26BK1" and seen["bidNtceOrd"] == "000"
     assert seen["url"].endswith("getBidPblancListInfoAtchFileInfo02")
     assert [f["name"] for f in files] == ["[제안요청서] 제안요청서.hwp", "공고문.pdf"]
+
+
+def test_s2b_supplier_mode_filter():
+    from monitor.collectors import s2b
+    def page(mode, region=""):
+        sel = f"<select name='limit_region_l1'><option>선택</option><option selected>{region}</option></select>" if region else ""
+        return f"<script>var estimateCompany = '{mode}';</script>{sel}"
+    src = {"allowed_regions": ["서울", "인천", "경기"]}
+    for html, want in [(page("1"), ""), (page("2"), "공급업체 지정"),
+                       (page("3", "경기"), ""), (page("3", "경북"), "참가가능지역 제한: 경북")]:
+        _, info = s2b.parse_detail(html)
+        assert s2b._exclude_reason(info, src) == want
+    _, info = s2b.parse_detail(page("3", "인천"))
+    assert info["견적제출"] == "지역제한 (인천)"

@@ -78,6 +78,18 @@ def parse_detail(html: str) -> tuple[list[dict], dict]:
             name=quote(name, encoding="cp949"), uniq=quote(uniq or name, encoding="cp949"))})
 
     info: dict[str, str] = {}
+    # 견적제출 공급업체: 1=전체공개, 2=공급업체 선택(업체 지정), 3=참가가능지역 선택
+    mode = re.search(r"var\s+estimateCompany\s*=\s*'(\d)'", html)
+    if mode:
+        regions = []
+        for i in range(1, 6):
+            o = soup.select_one(f"select[name='limit_region_l{i}'] option[selected]")
+            if o and clean(o.get_text()) not in ("", "선택"):
+                regions.append(clean(o.get_text()))
+        info["_견적방식"] = mode.group(1)
+        info["견적제출"] = {"1": "전체공개", "2": "공급업체 지정",
+                          "3": "지역제한" + (f" ({', '.join(regions)})" if regions else "")}.get(mode.group(1), "")
+        info["_지역"] = ",".join(regions)
     m = re.search(r"var\s+contractDay\s*=\s*'(\d{8})~(\d{8})'", html)
     if m:
         info["계약기간"] = f"{_fmt_ymd(m.group(1))} ~ {_fmt_ymd(m.group(2))}"
@@ -102,6 +114,19 @@ def parse_detail(html: str) -> tuple[list[dict], dict]:
             if text:
                 info["요청사항"] = re.sub(r"\n{3,}", "\n\n", text)[:1500]
     return files, info
+
+
+def _exclude_reason(info: dict, source: dict) -> str:
+    """견적제출이 전체공개이거나, 참가가능지역에 허용 지역(서울·인천·경기 등)이 있을 때만 표시."""
+    mode = info.get("_견적방식")
+    if mode == "2":
+        return "공급업체 지정"
+    if mode == "3":
+        allowed = source.get("allowed_regions", ["서울", "인천", "경기"])
+        regions = [r for r in info.get("_지역", "").split(",") if r]
+        if regions and not any(a in r for r in regions for a in allowed):
+            return "참가가능지역 제한: " + ", ".join(regions)
+    return ""
 
 
 def download(url: str) -> tuple[str, bytes]:
@@ -139,11 +164,13 @@ def collect(source: dict, lookback_days: float | None = None) -> list[Notice]:
                 break
             time.sleep(0.5)                               # 사이트에 부담 주지 않도록
     if source.get("details", True):
-        for n in out[: int(source.get("max_details", 80))]:
+        for n in out[: int(source.get("max_details", 300))]:
             try:
                 r = session().get(n.url, timeout=30)
                 r.encoding = "cp949"
                 n.files, n.info = parse_detail(r.text)
+                n.exclude_reason = _exclude_reason(n.info, source)
+                n.info = {k: v for k, v in n.info.items() if not k.startswith("_")}
             except Exception:  # noqa: BLE001 — 상세를 못 읽어도 목록은 유지
                 pass
             time.sleep(0.3)
