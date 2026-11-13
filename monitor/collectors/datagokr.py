@@ -24,7 +24,7 @@ from urllib.parse import unquote
 
 from ..models import Notice
 from .base import clean, session
-from .g2b import _fmt_dt, _get, _items, _to_int
+from .g2b import _fmt_dt, _get, _items, _to_int, shape
 
 # 기관 API에서 흔히 쓰는 항목 이름 후보 (앞에서부터 시도)
 CANDIDATES = {
@@ -89,13 +89,23 @@ def collect(source: dict, lookback_days: float | None = None) -> list[Notice]:
     out: list[Notice] = []
     for page in range(1, int(source.get("max_pages", 10)) + 1):
         params["pageNo"] = page
-        r = session().get(source["url"], params=params, timeout=40)
+        r = None
+        for attempt in range(2):                # 응답이 느린 기관(마사회 등)은 넉넉히 기다리고 한 번 더 시도
+            try:
+                r = session().get(source["url"], params=params, timeout=int(source.get("timeout", 90)))
+                break
+            except Exception:  # noqa: BLE001
+                if attempt == 1:
+                    raise
         if r.status_code >= 400 and not r.text.lstrip().startswith("<"):
             hint = {403: " — 이 API의 활용신청이 안 되었거나 아직 승인 전입니다"}.get(r.status_code, "")
             raise RuntimeError(f"{source.get('name', '')} API 응답 오류 {r.status_code}{hint}")
-        items, total = _items(_payload(r))      # 키 오류 등은 여기서 안내 문구와 함께 알려줌
+        payload = _payload(r)
+        items, total = _items(payload)          # 키 오류 등은 여기서 안내 문구와 함께 알려줌
         if page == 1:
             print(f"    [{source.get('name')}] 원본 {total}건, 항목: {sorted(items[0].keys())[:40] if items else '-'}")
+            if not items:
+                print(f"      응답 구조: {shape(payload)[:600]}")
         for it in items:
             title = clean(_pick(it, source, "title"))
             if not title:

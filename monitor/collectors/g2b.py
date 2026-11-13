@@ -81,6 +81,23 @@ def _fmt_dt(v: str) -> str:
     return v[:16]
 
 
+def shape(obj, depth: int = 0) -> str:
+    """응답의 구조만(값 제외) 짧게 보여준다. 0건일 때 원인 확인용."""
+    if depth > 3:
+        return "…"
+    if isinstance(obj, dict):
+        parts = []
+        for k, v in list(obj.items())[:12]:
+            if k in ("resultMsg", "resultCode", "totalCount", "numOfRows", "pageNo"):
+                parts.append(f"{k}={str(v)[:40]}")
+            else:
+                parts.append(f"{k}:{shape(v, depth + 1)}")
+        return "{" + ", ".join(parts) + "}"
+    if isinstance(obj, list):
+        return f"[{len(obj)}개 " + (shape(obj[0], depth + 1) if obj else "") + "]"
+    return type(obj).__name__
+
+
 def _items(payload: dict) -> tuple[list[dict], int]:
     # 인증키·주소 오류는 다른 형식으로 옴: {"OpenAPI_ServiceResponse": {"cmmMsgHeader": {...}}}
     err = (payload.get("OpenAPI_ServiceResponse") or {}).get("cmmMsgHeader")
@@ -302,6 +319,8 @@ def _collect_div(src, defaults, key, base, op, start, end, rows, max_pages, pars
             if page == 1 and t == start:
                 # 실행 기록용: 원본 건수와 항목 이름(값은 기록하지 않음)
                 print(f"    [{defaults['category']}] 조회기준 {div}: 원본 {total}건, 항목: {sorted(items[0].keys())[:40] if items else '-'}")
+                if not items:
+                    print(f"      응답 구조: {shape(payload)[:600]}")
             notices.extend(parse(it, src) for it in items)
             if page * rows >= total or not items:
                 break
