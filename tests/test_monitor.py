@@ -313,3 +313,20 @@ def test_fmt_dt_digit_dates():
     assert g2b._fmt_dt("20261112") == "2026-11-12"
     assert g2b._fmt_dt("202611121030") == "2026-11-12 10:30"
     assert g2b._fmt_dt("2026-11-12 10:30:00") == "2026-11-12 10:30"
+
+
+def test_kepco_collector(monkeypatch):
+    from monitor.collectors import kepco
+    payload = {"data": [{"no": "K-2026-1", "name": "발전소 홍보영상 제작 용역", "companyName": "한국남부발전(주)",
+                         "noticeDate": "20261112", "bidAttendReqCloseDatetime": "202611201000"}]}
+    seen = {}
+
+    class S:
+        def get(self, url, params=None, timeout=None):
+            seen.update(params)
+            return FakeResp(payload)
+    monkeypatch.setattr("monitor.collectors.kepco.session", lambda: S())
+    monkeypatch.setenv("KEPCO_API_KEY", "k")
+    n = kepco.collect({"id": "kepco_bid"}, 14)[0]
+    assert (n.title, n.org, n.posted, n.deadline) == ("발전소 홍보영상 제작 용역", "한국남부발전(주)", "2026-11-12", "2026-11-20 10:00")
+    assert seen["noticeBeginDate"] and seen["noticeEndDate"] and seen["apiKey"] == "k"

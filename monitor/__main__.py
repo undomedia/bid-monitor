@@ -35,7 +35,7 @@ _SECRET_RE = re.compile(r"((?:serviceKey|servicekey|ServiceKey|key|token|apikey|
 def redact(text: str) -> str:
     """오류 메시지에 들어간 인증키·토큰을 가린다 (대시보드는 공개되므로)."""
     text = _SECRET_RE.sub(r"\1***", text)
-    for env in ("G2B_SERVICE_KEY", "ANTHROPIC_API_KEY", "NAVER_CLIENT_SECRET", "TELEGRAM_BOT_TOKEN", "SMTP_PASSWORD"):
+    for env in ("G2B_SERVICE_KEY", "KEPCO_API_KEY", "ANTHROPIC_API_KEY", "NAVER_CLIENT_SECRET", "TELEGRAM_BOT_TOKEN", "SMTP_PASSWORD"):
         v = os.environ.get(env)
         if v and len(v) >= 8:
             text = text.replace(v, "***")

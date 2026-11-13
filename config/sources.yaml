@@ -47,6 +47,12 @@ sources:
     url: https://apis.data.go.kr/B500001/ebid/tndr3/servcList     # 용역 입찰공고 (영상제작은 용역)
     lookback_days: 14
 
+  - id: kepco_bid
+    type: kepco
+    name: 한국전력
+    category: 입찰공고
+    lookback_days: 14     # 한전과 발전 자회사 전체 (KEPCO_API_KEY 필요)
+
   # ═══ 학교장터 (학교·교육청 소액 견적요청) — 키 필요 없음 ═══
   - id: s2b
     type: s2b

@@ -36,6 +36,7 @@ jobs:
         env:
           TZ: Asia/Seoul
           G2B_SERVICE_KEY: ${{ secrets.G2B_SERVICE_KEY }}
+          KEPCO_API_KEY: ${{ secrets.KEPCO_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
           NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
