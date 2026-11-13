@@ -107,6 +107,12 @@ def _items(payload: dict) -> tuple[list[dict], int]:
                 "12": " — API 주소가 바뀌었을 수 있음 (sources.yaml 의 base_url/operation 확인)"}
         code = str(err.get("returnReasonCode", ""))
         raise RuntimeError(f"API 오류 {code}: {err.get('returnAuthMsg') or err.get('errMsg')}{hint.get(code, '')}")
+    for k, v in payload.items():                 # 예: {"nkoneps.com.response.ResponseError": {"header": {...}}}
+        if "ResponseError" in k and isinstance(v, dict):
+            h = v.get("header", {}) or {}
+            hint = {"07": " — 한 번에 요청한 범위(건수·기간)가 너무 큼", "08": " — 꼭 넣어야 하는 요청 값이 빠짐"}
+            code = str(h.get("resultCode", ""))
+            raise RuntimeError(f"API 오류 {code}: {h.get('resultMsg')}{hint.get(code, '')}")
     resp = payload.get("response", payload)
     header = resp.get("header", {}) or {}
     code = str(header.get("resultCode", "00"))

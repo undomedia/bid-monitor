@@ -347,3 +347,8 @@ def test_missing_key_is_skipped_not_failed(tmp_path, monkeypatch):
     cli.cmd_run(args, {"db_path": "x.db"}, [{"id": "naver_requests", "type": "naver", "queries": ["a"]}])
     st = Store(tmp_path / "x.db").statuses()["naver_requests"]
     assert st["ok"] is True and st["skipped"] is True
+
+
+def test_g2b_response_error_is_reported():
+    with pytest.raises(RuntimeError, match="범위"):
+        g2b._items({"nkoneps.com.response.ResponseError": {"header": {"resultCode": "07", "resultMsg": "입력범위값 초과 에러"}}})
