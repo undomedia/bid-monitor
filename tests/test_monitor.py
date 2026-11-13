@@ -183,7 +183,7 @@ def test_failure_isolated(tmp_path, monkeypatch):
     args = type("A", (), {"only": None, "days": None, "no_notify": True, "no_analyze": True, "verbose": False})()
     cli.cmd_run(args, {"db_path": "x.db"}, [{"id": "g2b_bid", "type": "g2b", "stage": "bid"}])
     st = Store(tmp_path / "x.db").statuses()["g2b_bid"]
-    assert st["ok"] is False and "G2B_SERVICE_KEY" in st["error"]
+    assert st["ok"] is True and st["skipped"] is True      # 키 없음 = 실패가 아니라 '설정 전'
 
 
 def test_message_split():
