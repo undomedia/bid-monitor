@@ -317,8 +317,11 @@ def test_fmt_dt_digit_dates():
 
 def test_kepco_collector(monkeypatch):
     from monitor.collectors import kepco
-    payload = {"data": [{"no": "K-2026-1", "name": "발전소 홍보영상 제작 용역", "companyName": "한국남부발전(주)",
-                         "noticeDate": "20261112", "bidAttendReqCloseDatetime": "202611201000"}]}
+    payload = {"data": [{"no": "K-2026-1", "name": "발전소 홍보영상 제작 용역", "companyId": "COM04",
+                         "placeName": "한국남부발전(주)", "noticeDate": "20261112",
+                         "bidAttendReqCloseDatetime": "202611201000", "presumedPrice": "50000000",
+                         "competitionType": "Limited", "bidType": "Nego", "itemType": "Service",
+                         "filenlink1": "https://srm.kepco.net/f/1", "filename1": "제안요청서.hwp"}]}
     seen = {}
 
     class S:
@@ -330,3 +333,6 @@ def test_kepco_collector(monkeypatch):
     n = kepco.collect({"id": "kepco_bid"}, 14)[0]
     assert (n.title, n.org, n.posted, n.deadline) == ("발전소 홍보영상 제작 용역", "한국남부발전(주)", "2026-11-12", "2026-11-20 10:00")
     assert seen["noticeBeginDate"] and seen["noticeEndDate"] and seen["apiKey"] == "k"
+    assert n.source_name == "한국남부발전" and n.amount == 50_000_000 and n.kind == "용역"
+    assert n.info["계약방법"] == "제한경쟁" and n.info["낙찰방법"] == "협상에 의한 계약"
+    assert n.files == [{"name": "제안요청서.hwp", "url": "https://srm.kepco.net/f/1"}]

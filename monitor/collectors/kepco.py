@@ -17,16 +17,57 @@ from .g2b import _fmt_dt, _get, _to_int
 URL = "https://bigdata.kepco.co.kr/openapi/v1/electContract.do"
 HOME = "https://srm.kepco.net/"
 
-FIELDS = {
-    "title": ["name", "bidName", "noticeName", "title"],
-    "no": ["no", "noticeNo", "bidNo"],
-    "org": ["companyName", "companyNm", "company", "orgName", "deptName"],
-    "posted": ["noticeDate", "noticeDatetime", "noticeBeginDate", "regDate", "pubDate"],
-    "deadline": ["bidAttendReqCloseDatetime", "bidCloseDatetime", "bidEndDatetime", "closeDatetime", "noticeEndDate"],
-    "amount": ["estimatedPrice", "budgetAmount", "presmptPrce", "estimatePrice", "amount"],
-    "url": ["url", "detailUrl", "link"],
-    "kind": ["contractType", "contractMethod", "bidType", "purchaseType"],
+FIELDS = {   # 전력데이터 개방포털 '전자입찰 계약정보 가이드'의 응답 결과 항목
+    "title": ["name"],
+    "no": ["no"],
+    "org": ["placeName", "contractReqDepartmentName"],
+    "posted": ["noticeDate", "createDatetime"],
+    "deadline": ["bidAttendReqCloseDatetime", "endDatetime"],
+    "amount": ["presumedPrice", "presumedAmount", "estimatedPriceBasicAmount", "subcontractBudgetAmount"],
+    "url": ["url"],
 }
+
+COMPANY = {"COM01": "한국전력공사", "COM02": "한국서부발전", "COM03": "한국전력국제원자력대학원대학교",
+           "COM04": "한국남부발전", "COM05": "한국중부발전", "COM06": "한국남동발전", "COM08": "한국동서발전",
+           "COM09": "한국전력기술", "COM10": "한전KPS", "COM11": "한국전력거래소", "COM12": "한국원자력연료",
+           "COM14": "한국발전교육원", "COM16": "한국해상풍력", "COM19": "KAPES"}
+COMPETITION = {"Open": "일반경쟁", "Destination": "지명경쟁", "Limited": "제한경쟁", "Private": "수의계약"}
+BID_TYPE = {"LimitedLowestPrice": "제한적최저가", "LowestPrice": "최저가", "QualifiedEval": "적격심사",
+            "CollectivelyBid": "일괄입찰", "Nego": "협상에 의한 계약", "TotalEvalSuccess": "종합심사낙찰제"}
+ITEM_TYPE = {"Construction": "공사", "Service": "용역"}
+PURCHASE = {"Product": "자재구매", "ConstructionService": "공사용역"}
+
+
+def _info(it: dict) -> dict:
+    def g(k):
+        return clean(_get(it, k))
+    info = {
+        "추정가격": f"{_to_int(g('presumedPrice') or g('presumedAmount')):,}원" if _to_int(g("presumedPrice") or g("presumedAmount")) else "",
+        "계약방법": COMPETITION.get(g("competitionType"), g("competitionType")),
+        "낙찰방법": BID_TYPE.get(g("bidType"), g("bidType")),
+        "낙찰자 결정": g("bidTypeDetail"),
+        "입찰신청 마감": _fmt_dt(g("bidAttendReqCloseDatetime")),
+        "투찰 시작": _fmt_dt(g("beginDatetime")),
+        "입찰 종료": _fmt_dt(g("endDatetime")),
+        "계약 착수일": g("contractBeginEndDate"),
+        "납기일": g("deliveryDueDate"),
+        "참가자격": g("bidAttendRestrict") or g("etc"),
+        "공동수급": {"1": "가능", "0": "불가"}.get(g("jointSupplyDemandYn"), ""),
+        "현장설명회": ({"1": "있음", "0": "없음"}.get(g("fieldIntroYn"), "")
+                    + (f" ({_fmt_dt(g('fieldIntroBeginDatetime'))})" if g("fieldIntroBeginDatetime") else "")),
+        "계약의뢰부서": g("contractReqDepartmentName"),
+        "담당자": g("creatorName"),
+    }
+    return {k: v for k, v in info.items() if v}
+
+
+def _files(it: dict) -> list[dict]:
+    out = []
+    for i in range(1, 11):
+        link = _get(it, f"filenlink{i}", f"filelink{i}")
+        if link:
+            out.append({"name": _get(it, f"filename{i}") or f"첨부{i}", "url": link})
+    return out
 
 
 def _rows(payload) -> list[dict]:
@@ -71,14 +112,17 @@ def collect(source: dict, lookback_days: float | None = None) -> list[Notice]:
         if not title:
             continue
         no = _get(it, *FIELDS["no"])
+        company = COMPANY.get(_get(it, "companyId"), "")
         out.append(Notice(
-            source_id=source["id"], source_name=source.get("name", "한국전력"),
+            source_id=source["id"], source_name=company or source.get("name", "한국전력"),
             category=source.get("category", "입찰공고"),
             title=title, url=_get(it, *FIELDS["url"]) or HOME, uid=no or title,
-            org=clean(_get(it, *FIELDS["org"])) or "한국전력공사",
+            org=clean(_get(it, *FIELDS["org"])) or company or "한국전력공사",
             posted=_fmt_dt(_get(it, *FIELDS["posted"]))[:10],
             deadline=_fmt_dt(_get(it, *FIELDS["deadline"])),
             amount=_to_int(_get(it, *FIELDS["amount"])),
-            kind=clean(_get(it, *FIELDS["kind"])),
+            kind=" · ".join(x for x in (ITEM_TYPE.get(_get(it, "itemType"), ""),
+                                        PURCHASE.get(_get(it, "purchaseType"), "")) if x),
+            files=_files(it), info=_info(it),
         ))
     return out
