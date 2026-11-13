@@ -111,6 +111,16 @@ def cmd_run(args, settings, sources) -> int:
         first_run = not store.has_source(src["id"])
         try:
             items = filters.apply(fn(src, args.days), src, settings)
+            if src.get("attachments"):            # 첨부파일이 별도 기능인 API(나라장터 02): 걸러진 공고만 추가 조회
+                from .collectors.g2b import fetch_attachments
+                for n in items:
+                    known = store.get(n.id)
+                    if n.files or (known and known.get("files")):
+                        continue
+                    try:
+                        n.files = fetch_attachments(n, src)
+                    except Exception:  # noqa: BLE001
+                        pass
             new = store.add(items, now)
             status = {"ok": True, "checked": now, "found": len(items), "new": len(new), "error": ""}
             # 처음 등록한 소스는 기존 공고가 한꺼번에 알림으로 가지 않도록 조용히 저장만

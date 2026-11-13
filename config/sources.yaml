@@ -23,6 +23,7 @@ sources:
     name: 나라장터 입찰공고
     stage: bid           # 입찰공고
     lookback_days: 3
+    attachments: true    # 영상 관련 공고만 첨부파일(공고서·제안요청서 등)을 추가로 받음
     rows: 100            # 02 버전은 한 번에 받을 수 있는 범위가 좁음 ('입력범위값 초과' 방지)
     chunk_days: 1
 

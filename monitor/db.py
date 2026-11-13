@@ -67,6 +67,10 @@ class Store:
         self.conn.commit()
         return new
 
+    def get(self, notice_id: str) -> dict | None:
+        row = self.conn.execute("SELECT data FROM notices WHERE id=?", (notice_id,)).fetchone()
+        return json.loads(row[0]) if row else None
+
     def recent(self, days: int, with_analysis: bool = False) -> list[dict]:
         since = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
         cur = self.conn.execute(

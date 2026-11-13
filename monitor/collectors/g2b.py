@@ -338,3 +338,34 @@ def _collect_div(src, defaults, key, base, op, start, end, rows, max_pages, pars
             page += 1
         t = t2
     return notices
+
+
+def fetch_attachments(notice: Notice, source: dict) -> list[dict]:
+    """02 버전은 첨부파일이 별도 기능(getBidPblancListInfoAtchFileInfo02)이라 공고번호로 따로 받는다."""
+    key = unquote(os.environ.get(source.get("service_key_env", "G2B_SERVICE_KEY"), "").strip())
+    if not key or "-" not in notice.uid:
+        return []
+    no, ord_ = notice.uid.rsplit("-", 1)
+    base = source.get("base_url", STAGES["bid"]["base_url"]).rstrip("/")
+    params = {"serviceKey": key, "type": "json", "pageNo": 1, "numOfRows": 50,
+              "inqryDiv": 2, "bidNtceNo": no, "bidNtceOrd": ord_, "bsnsDivCd": source.get("bsns_div_cd", 5)}
+    r = session().get(f"{base}/{source.get('attach_op', 'getBidPblancListInfoAtchFileInfo02')}", params=params, timeout=40)
+    if r.status_code >= 400:
+        return []
+    try:
+        items, _ = _items(r.json())
+    except Exception:  # noqa: BLE001 — 첨부파일을 못 받아도 공고는 그대로 표시
+        return []
+    out, seen = [], set()
+    for it in items:
+        url = next((str(v) for k, v in it.items() if "url" in k.lower() and str(v).startswith("http")), "")
+        if not url or url in seen:
+            continue
+        seen.add(url)
+        name = next((str(v) for k, v in it.items()
+                     if k.lower().endswith(("filenm", "flnm")) and v), "") or \
+            next((str(v) for k, v in it.items() if k.lower().endswith("nm") and "div" not in k.lower() and v), "")
+        div = next((str(v) for k, v in it.items() if "div" in k.lower() and k.lower().endswith("nm") and v), "")
+        label = f"[{div}] {name}" if div and name else (name or div or "첨부파일")
+        out.append({"name": clean(label), "url": url})
+    return out

@@ -369,3 +369,24 @@ def test_datagokr_month_param_and_key_name(monkeypatch):
     months = [c["notice_month"] for c in calls]
     assert len(months) >= 2 and months == sorted(months) and all(len(m) == 6 for m in months)
     assert calls[0]["ServiceKey"] == "k" and "serviceKey" not in calls[0]
+
+
+def test_fetch_attachments_02(monkeypatch):
+    from monitor.models import Notice
+    seen = {}
+    payload = api([{"bidNtceNo": "R26BK1", "bidNtceOrd": "000", "eorderDocDivNm": "제안요청서",
+                    "eorderAtchFileNm": "제안요청서.hwp", "eorderAtchFileUrl": "https://g2b.example/f1"},
+                   {"bidNtceNo": "R26BK1", "bidNtceOrd": "000", "atchFileNm": "공고문.pdf",
+                    "atchFileUrl": "https://g2b.example/f2"}])
+
+    class S:
+        def get(self, url, params=None, timeout=None):
+            seen.update(params); seen["url"] = url
+            return FakeResp(payload)
+    monkeypatch.setattr("monitor.collectors.g2b.session", lambda: S())
+    monkeypatch.setenv("G2B_SERVICE_KEY", "k")
+    n = Notice(source_id="g2b_bid", source_name="", category="입찰공고", title="t", url="", uid="R26BK1-000")
+    files = g2b.fetch_attachments(n, {"id": "g2b_bid"})
+    assert seen["inqryDiv"] == 2 and seen["bidNtceNo"] == "R26BK1" and seen["bidNtceOrd"] == "000"
+    assert seen["url"].endswith("getBidPblancListInfoAtchFileInfo02")
+    assert [f["name"] for f in files] == ["[제안요청서] 제안요청서.hwp", "공고문.pdf"]
