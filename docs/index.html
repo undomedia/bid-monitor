@@ -154,7 +154,7 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 </div>
 
 <script>
-const APP_VERSION = "0c20ef8bcf";
+const APP_VERSION = "05b7f96565";
 const G2B = ["발주계획", "사전규격", "입찰공고"];
 const TAB_DESC = {
   "입찰공고": "지금 입찰 가능한 공고 · 마감 지난 공고는 숨김",
@@ -353,6 +353,8 @@ function render() {
     b.classList.toggle("on", b.dataset.tab === state.tab);
     const c = b.dataset.tab === "star" ? stars.size : countFor(n => inTab(n, b.dataset.tab));
     b.querySelector(".n").textContent = c || "";
+    // 수집할 곳이 없는 '제작 의뢰·공모' 탭은 비어 있으면 숨김
+    if (b.dataset.tab === "req") b.style.display = DATA.notices.some(n => inTab(n, "req")) ? "" : "none";
   });
   document.getElementById("tabdesc").textContent = TAB_DESC[state.tab] || "";
   // Safari(특히 Dock 앱)가 탭 숫자를 넣은 뒤 다시 그리지 않아 숫자가 안 보이거나 글자가 겹치는 문제 방지
