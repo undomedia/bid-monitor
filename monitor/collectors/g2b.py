@@ -22,8 +22,9 @@ from .base import clean, session
 STAGES = {
     "bid": {
         "category": "입찰공고",
-        "base_url": "https://apis.data.go.kr/1230000/ad/BidPublicInfoService",
-        "operation": "getBidPblancListInfoServc",
+        # 2026년 개편된 '02' 버전 (공공데이터포털 활용신청 화면의 End Point 기준)
+        "base_url": "https://apis.data.go.kr/1230000/ad/BidPublicInfoService02",
+        "operation": "getBidPblancListInfoServc02",
     },
     "prespec": {
         "category": "사전규격",
