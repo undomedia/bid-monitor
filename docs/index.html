@@ -154,7 +154,7 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 </div>
 
 <script>
-const APP_VERSION = "574f02cc65";
+const APP_VERSION = "de16a7697b";
 const G2B = ["발주계획", "사전규격", "입찰공고"];
 const TAB_DESC = {
   "입찰공고": "지금 입찰 가능한 공고 · 마감 지난 공고는 숨김",
@@ -314,7 +314,9 @@ function card(n) {
   const own = isG2B(n) || n.category === "학교장터";
   const stageCls = own ? "st-" + n.category : n.category === "방송사 공모" ? "st-방송사"
     : n.category === "공모전" ? "st-공모전" : "st-req";
-  const stageLabel = own ? n.category : n.source_name;
+  // 입찰공고 탭의 기관 API 공고(마사회·수자원공사 등)는 기관 이름을 배지로
+  const stageLabel = own ? (n.category === "입찰공고" && !String(n.source_id).startsWith("g2b") ? n.source_name : n.category)
+                         : n.source_name;
   const isNew = n.first_seen && n.first_seen.slice(0, 10) === latestRun.slice(0, 10);
   const meta = [
     n.org && `<span>${esc(n.org)}</span>`,
