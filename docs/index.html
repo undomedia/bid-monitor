@@ -154,7 +154,7 @@ label.tog { font-size:13px; color:var(--sub); display:flex; align-items:center; 
 </div>
 
 <script>
-const APP_VERSION = "8ba05e4c47";
+const APP_VERSION = "0c20ef8bcf";
 const G2B = ["발주계획", "사전규격", "입찰공고"];
 const TAB_DESC = {
   "입찰공고": "지금 입찰 가능한 공고 · 마감 지난 공고는 숨김",
@@ -367,7 +367,7 @@ function render() {
 }
 
 function renderAlerts() {
-  const bad = DATA.sources.filter(s => s.ok === false);
+  const bad = DATA.sources.filter(s => s.ok === false && !s.skipped);
   if (!bad.length) { document.getElementById("alerts").innerHTML = ""; return; }
   document.getElementById("alerts").innerHTML = `<details class="alert"><summary>⚠ 수집 실패 ${bad.length}곳 — 이 출처의 새 공고가 빠졌을 수 있습니다</summary>
     ${bad.map(s => `<div>· <b>${esc(s.name)}</b>: ${esc(s.error)}${s.last_ok ? ` (마지막 성공 ${esc(s.last_ok)})` : ""}</div>`).join("")}</details>`;
